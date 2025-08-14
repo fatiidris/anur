@@ -242,7 +242,6 @@
         $status = $RemainingAmount > 0 ? 'Pending' : 'Paid';
     @endphp
 
-    
     <table border="1" cellpadding="8" cellspacing="0" width="100%">
         <thead>
             <tr>
