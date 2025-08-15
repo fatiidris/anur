@@ -1,66 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# An-Nur School Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+An-Nur School Management System is a comprehensive web application built with Laravel that provides a platform for managing school operations. It offers distinct roles for administrators, teachers, students, and parents, each with a tailored set of features to streamline communication, academic management, and administrative tasks.
 
-## About Laravel
+This system is designed to be a central hub for all school-related activities, from managing student and teacher records to handling academic schedules, examinations, and fee collections. It aims to improve efficiency, foster better communication between stakeholders, and provide a seamless educational experience for everyone involved.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The application includes the following features, categorized by user role:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Admin
 
-## Learning Laravel
+- **User Management:** Add, edit, delete, and view lists of admins, teachers, students, and parents.
+- **Academic Management:**
+    - Manage classes and subjects.
+    - Assign subjects to classes.
+    - Create and manage class timetables.
+- **Examinations:**
+    - Create and manage examination schedules.
+    - Record and manage student marks.
+    - Define grading systems.
+- **Attendance:**
+    - Monitor student attendance.
+    - Generate attendance reports.
+- **Communication:**
+    - Post and manage announcements on the notice board.
+    - Send emails to users.
+- **Homework:**
+    - Assign homework to classes.
+    - Track homework submissions.
+- **Fee Collection:**
+    - Manage fee collections from students.
+    - View fee collection reports.
+- **System Settings:** Configure application settings.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Teacher
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Account Management:**
+    - Manage personal account details.
+    - Change password.
+- **Academic Information:**
+    - View assigned classes and subjects.
+    - Access class and exam timetables.
+- **Student Management:**
+    - View a list of their students.
+    - Take student attendance.
+- **Homework:**
+    - Assign and manage homework for their classes.
+    - View homework submissions.
+- **Communication:**
+    - View notices on the notice board.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+To set up the project locally, follow these steps:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+1.  **Clone the repository:**
 
-### Premium Partners
+    ```bash
+    git clone https://github.com/your-username/your-repository.git
+    cd your-repository/an_nur
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+2.  **Install dependencies:**
 
-## Contributing
+    ```bash
+    composer install
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3.  **Create the environment file:**
 
-## Code of Conduct
+    ```bash
+    cp .env.example .env
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4.  **Generate the application key:**
 
-## Security Vulnerabilities
+    ```bash
+    php artisan key:generate
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5.  **Configure the database:**
 
-## License
+    Open the `.env` file and update the database credentials:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    ```
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=an_nur
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+
+6.  **Run database migrations:**
+
+    ```bash
+    php artisan migrate
+    ```
+
+7.  **Start the development server:**
+
+    ```bash
+    php artisan serve
+    ```
+
+    The application will be available at `http://127.0.0.1:8000`.
+
+## Database
+
+The project includes a SQL file that can be used to seed the database with initial data. After creating your database, you can import the `database/an_nur.sql` file to populate the necessary tables.
+
+**Note:** Using the SQL file is an alternative to running migrations and seeders. If you use the SQL file, you may not need to run `php artisan migrate`.
+
+## User Roles and Credentials
+
+The application has four user roles: Admin, Teacher, Student, and Parent.
+
+To get started, you will need to create an admin user. You can do this by running the following command:
+
+```bash
+php artisan tinker
+```
+
+Then, run the following code to create a new admin user:
+
+```php
+\App\Models\User::create([
+    'name' => 'Admin',
+    'email' => 'admin@example.com',
+    'password' => bcrypt('password'),
+    'user_type' => 1
+]);
+```
+
+After creating the admin user, you can log in with the following credentials:
+
+-   **Email:** `admin@example.com`
+-   **Password:** `password`
+
+Once logged in, you can create new teachers, students, and parents through the admin panel.
+
+### Student
+
+- **Account Management:**
+    - Manage personal account details.
+    - Change password.
+- **Academic Information:**
+    - View their subjects and class timetable.
+    - View exam schedules and results.
+- **Attendance:**
+    - View their attendance records.
+- **Homework:**
+    - View and submit homework assignments.
+- **Fee Payment:**
+    - View fee payment history.
+    - Make online payments via Paystack.
+- **Communication:**
+    - View notices on the notice board.
+
+### Parent
+
+- **Account Management:**
+    - Manage personal account details.
+    - Change password.
+- **Child's Academic Progress:**
+    - View their child's subjects, class timetable, and exam results.
+    - Monitor their child's attendance.
+- **Homework:**
+    - View their child's homework assignments and submissions.
+- **Fee Payment:**
+    - Manage their child's fee payments.
+- **Communication:**
+    - View notices on the notice board.
