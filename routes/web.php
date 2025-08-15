@@ -335,3 +335,8 @@ Route::get('parent/paystack/payment-success/{student_id}', [FeesCollectionContro
 Route::get('parent/paystack/payment-error/{student_id}', [FeesCollectionController::class, 'PaymentErrorP'])->name('parent.paystack.error');
 
 });
+
+//frontend route
+Route::get('/my-layout', function () {
+    return view('frontend.layouts.layout');
+});
