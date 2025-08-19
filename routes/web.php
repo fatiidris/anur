@@ -20,6 +20,7 @@ use App\Http\Controllers\CommunicateController;
 use App\Http\Controllers\HomeworkController;
 use App\Http\Controllers\FeesCollectionController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FrontendController;
 
 
 
@@ -48,7 +49,17 @@ use App\Http\Controllers\ChatController;
 //     return view('welcome');
 // });
 
-Route::get('/', [AuthController::class, 'login']);
+
+// Frontend routes
+Route::get('/', [FrontendController::class, 'home'])->name('home');
+Route::get('/about', [FrontendController::class, 'about'])->name('about');
+Route::get('/admission', [FrontendController::class, 'admission'])->name('admission');
+Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
+Route::get('/updates', [FrontendController::class, 'updates'])->name('updates');
+Route::get('/results', [FrontendController::class, 'results'])->name('results');
+
+
+Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'AuthLogin']);
 Route::get('logout', [AuthController::class, 'logout']);
 Route::get('forgot-password', [AuthController::class, 'forgotpassword']);
@@ -336,9 +347,4 @@ Route::get('parent/paystack/payment-success/{student_id}', [FeesCollectionContro
 
 Route::get('parent/paystack/payment-error/{student_id}', [FeesCollectionController::class, 'PaymentErrorP'])->name('parent.paystack.error');
 
-});
-
-//frontend route
-Route::get('/my-layout', function () {
-    return view('frontend.layouts.layout');
 });
