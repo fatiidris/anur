@@ -312,3 +312,60 @@
   </section>
 </div>
   @endsection
+
+@section('script')
+<script type="text/javascript">
+    function get_chat_windows(receiver_id) {
+        $.ajax({
+            type: "POST",
+            url: "{{ url('get_chat_windows') }}",
+            data: {
+                receiver_id: receiver_id,
+                _token: "{{ csrf_token() }}"
+            },
+            dataType: "json",
+            success: function(data) {
+                $('.chat').html(data.success);
+                $('.chat-history').scrollTop($('.chat-history')[0].scrollHeight);
+            },
+            error: function(data, textStatus, errorThrown) {
+                console.log(data);
+            }
+        });
+    }
+
+    $('body').on('click', '.chat-list', function() {
+        $('.chat-list').removeClass('active');
+        $(this).addClass('active');
+        var receiver_id = $(this).attr('data-user-id');
+        get_chat_windows(receiver_id);
+    });
+
+    $('body').on('submit', '#submit_message', function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "{{ url('submit_message') }}",
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function(data) {
+                $('.chat').html(data.success);
+                $('#submit_message input[name="message"]').val('');
+                $('.chat-history').scrollTop($('.chat-history')[0].scrollHeight);
+            },
+            error: function(data, textStatus, errorThrown) {
+                console.log(data);
+            }
+        });
+    });
+
+    setInterval(function() {
+        var receiver_id = $('.chat-list.active').attr('data-user-id');
+        if (receiver_id) {
+            get_chat_windows(receiver_id);
+        }
+    }, 5000);
+</script>
+@endsection
