@@ -29,9 +29,9 @@
                   <thead>
                     <tr>
                       <th>Subject</th>
-                      <th>Class Work</th>
-                      <th>Test Work</th>
-                      <th>Home Work</th>
+                      <th>CA1</th>
+                      <th>CA2</th>
+                      <th>CA3</th>
                       <th>Exam</th>
                       <th>Total Score</th>
                       <th>Passing Mark</th>
@@ -52,9 +52,9 @@
                     @endphp
                   <tr>
                     <td style="width: 300px;">{{ $exam['subject_name']}}</td>
-                    <td>{{ $exam['class_work']}}</td>
-                    <td>{{ $exam['home_work']}}</td>
-                    <td>{{ $exam['test_work']}}</td>
+                    <td>{{ $exam['ca1']}}</td>
+                    <td>{{ $exam['ca2']}}</td>
+                    <td>{{ $exam['ca3']}}</td>
                     <td>{{ $exam['exam']}}</td>
                     <td>{{ $exam['total_score']}}</td>
                     <td>{{ $exam['passing_mark']}}</td>

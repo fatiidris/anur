@@ -2,7 +2,24 @@
 
 @section('content')
     <div class="container">
-        <h1>Updates</h1>
-        <p>This is the updates page.</p>
+        <section class="sub-header">
+            <h1>Our Updates</h1>
+        </section>
+
+        <!-- Updates Gallery -->
+        <div class="gallery">
+            <img src="{{ url('public/frontend/Img/image1.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image2.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image3.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image9.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image4.jpg')}}" alt="">
+        </div>
+        <div class="gallery">
+            <img src="{{ url('public/frontend/Img/image1.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image2.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image3.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image9.jpg')}}" alt="">
+            <img src="{{ url('public/frontend/Img/image4.jpg')}}" alt="">
+        </div>
     </div>
 @endsection

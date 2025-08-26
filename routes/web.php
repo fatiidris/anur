@@ -74,10 +74,6 @@ Route::group(['middleware' => 'common'], function(){
     Route::post('get_chat_windows', [ChatController::class, 'get_chat_windows']);
 });
 
-// Route::get('admin/dashboard', function () {
-//     return view('admin.dashboard');
-// });
-
 
 Route::group(['middleware' => 'admin'], function(){
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard']);

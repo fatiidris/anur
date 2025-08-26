@@ -2,7 +2,9 @@
 
 @section('content')
     <div class="container">
-        <h1>Admission</h1>
-        <p>This is the admission page.</p>
+         <!-------- Admission -------->
+        <section class="sub-header">
+            <h1>Admission on Process</h1>
+        </section>
     </div>
 @endsection
