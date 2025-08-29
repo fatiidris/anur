@@ -96,13 +96,12 @@
                 </div>
               </div>
           </div>
-
-        
+          
         </div>
 
-      </div><!-- /.container-fluid -->
+      </div>
     </section>
-    <!-- /.content -->
+
   </div>
-  <!-- /.content-wrapper -->
+
   @endsection
