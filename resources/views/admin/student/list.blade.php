@@ -206,11 +206,17 @@
                     <td>{{ $value->weight }}</td>
                     <td>{{ ($value->status  == 0) ? 'Active' : 'Inactive'}}</td>
                     <td>{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                    <td style="min-width: 350px"> 
-                      <a href="{{ url ('admin/student/edit/'.$value->id)}}" class="btn btn-primary btn-sm">Edit</a>
-                      <a href="{{ url ('admin/student/delete/'.$value->id)}}" class="btn btn-danger btn-sm">Delete</a>
-                      <a href="{{ url ('chat?receiver_id='.base64_encode($value->id)) }}" class="btn btn-success">Send Message</a>
-                  </td>
+                   <td style="min-width: 350px"> 
+                      <a href="{{ url('admin/student/edit/'.$value->id) }}" class="btn btn-primary btn-sm" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{{ url('admin/student/delete/'.$value->id) }}" class="btn btn-danger btn-sm" title="Delete">
+                        <i class="fas fa-trash-alt"></i>
+                      </a>
+                      <a href="{{ url('chat?receiver_id='.base64_encode($value->id)) }}" class="btn btn-success" title="Send Message">
+                        <i class="fas fa-paper-plane"></i>
+                      </a>
+                    </td>
                   </tr>
                   @endforeach
                   </tbody>
