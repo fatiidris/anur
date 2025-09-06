@@ -6,7 +6,7 @@
      @include('chat._chat')
  </div>
 <div class="chat-message clearfix">
-     <form action="" id="submit_message" method="post" class="mb-0">
+     <form action="{{ url('submit_message') }}" id="submit_message" method="post" class="mb-0">
           <input type="hidden" value="{{ $getReceiver->id }}" name="receiver_id">
           {{ csrf_field() }}
           <textarea name="message" id="ClearMessage" required class="form-control"></textarea>

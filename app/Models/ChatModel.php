@@ -20,7 +20,7 @@ class ChatModel extends Model
                     $q->where('receiver_id', $sender_id)
                         ->where('sender_id', $receiver_id) 
                         ->where('status', '>', '-1');    
-                })->orwhere(function($q) use ($receiver_id, $sender_id){
+                })->orWhere(function($q) use ($receiver_id, $sender_id){
                     $q->where('receiver_id', $receiver_id)
                         ->where('sender_id', $sender_id);    
                     });
@@ -68,17 +68,19 @@ class ChatModel extends Model
              })
              ->groupBy(DB::raw('chat.id', 'desc'))
              ->get();
+
+
              $result = array();
              foreach($getuserchat as $value)
              {
                 $data = array();
-                $data['id'] =$value->id;
-                $data['message'] =$value->message;
-                $data['created_date'] =$value->created_date;
-                $data['user_id'] =$value->connect_user_id;
-                $data['name'] =$value->getConnectUser->name.''.$value->getConnectUser->last_name;
-                $data['profile_pic'] =$value->getConnectUser->getProfileDirect();
-                $data['messasecount'] =$value->CountMessage($value->connect_user_id, $user_id);
+                $data['id'] = $value->id;
+                $data['message'] = $value->message;
+                $data['created_date'] = $value->created_date;
+                $data['user_id'] = $value->connect_user_id;
+                $data['name'] = $value->getConnectUser->name.' '.$value->getConnectUser->last_name;
+                $data['profile_pic'] = $value->getConnectUser->getProfileDirect();
+                $data['messagecount'] = $value->CountMessage($value->connect_user_id, $user_id);
                 $result[] = $data;
              } 
         return $result;              
@@ -88,5 +90,9 @@ class ChatModel extends Model
          return self::where('sender_id', '=',$connect_user_id)->where('receiver_id', '=',$user_id) 
          ->where('status', '=', 0)->count();      
      }
-    
+    static public function UpdateCount($sender_id, $receiver_id)
+    {
+        self::where('sender_id', '=',$receiver_id)->where('receiver_id', '=',$sender_id) 
+         ->where('status', '=', 0)->update(['status' => '1']);
+    }
 }

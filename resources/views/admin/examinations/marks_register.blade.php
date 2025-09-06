@@ -105,10 +105,18 @@
                                           $getMark = $subject->getMark($student->id, Request::get('exam_id'), Request::get('class_id'), $subject->subject_id);
                                           
                                           if (!empty($getMark)) {
-                                              $totalMark = $getMark->class_work + $getMark->home_work + $getMark->test_work + $getMark->exam;
+                                              $totalMark = $getMark->ca1 + $getMark->ca2 + $getMark->ca3 + $getMark->exam;
                                           }
 
                                           $totalStudentMark = $totalStudentMark + $totalMark;
+
+                                          // Subject position calculation
+                                           $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
+                                              Request::get('exam_id'),
+                                              Request::get('class_id'),
+                                              $subject->subject_id,
+                                              $student->id
+                                          );
                                       @endphp
                                       
                                       <td>
@@ -157,6 +165,7 @@
                                             <div style="margin-bottom: 10px;">
                                             <b> Total Mark :</b>{{ $totalMark }} <br>
                                             <b> Passing Mark : </b>{{ $subject->passing_mark }} <br>
+                                            <b>Position:</b> {{ $subjectPosition }} <br>
                                             @php
                                                $getLoopGrade = App\Models\MarksGradeModel::getGrade($totalMark);
                                             @endphp

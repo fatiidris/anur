@@ -14,6 +14,8 @@ use App\Http\Controllers\ParentController;
 use App\Http\Controllers\AssignClassTeacherController;
 use App\Http\Controllers\ClassTimetableController;
 use App\Http\Controllers\ExaminationsController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TermController;
 use App\Http\Controllers\CalenderController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CommunicateController;
@@ -192,6 +194,22 @@ Route::group(['middleware' => 'admin'], function(){
     Route::post('admin/examinations/marks_grade/edit/{id}', [ExaminationsController::class, 'marks_grade_update']);
     Route::get('admin/examinations/marks_grade/delete/{id}', [ExaminationsController::class, 'marks_grade_delete']);
     Route::get('admin/my_exam_result/print', [ExaminationsController::class, 'MyExamResultPrint']);
+
+    // session url
+    Route::get('admin/examinations/session/list', [SessionController::class, 'list']);
+    Route::get('admin/examinations/session/add', [SessionController::class, 'add']);
+    Route::post('admin/examinations/session/add', [SessionController::class, 'insert']);
+    Route::get('admin/examinations/session/edit/{id}', [SessionController::class, 'edit']);
+    Route::post('admin/examinations/session/edit/{id}', [SessionController::class, 'update']);
+    Route::get('admin/examinations/session/delete/{id}', [SessionController::class, 'delete']);
+
+   // term url
+    Route::get('admin/examinations/term/list', [TermController::class, 'list'])->name('admin.term.list');
+    Route::get('admin/examinations/term/add', [TermController::class, 'add'])->name('admin.term.add');
+    Route::post('admin/examinations/term/add', [TermController::class, 'insert']);
+    Route::get('admin/examinations/term/edit/{id}', [TermController::class, 'edit'])->name('admin.term.edit');
+    Route::post('admin/examinations/term/edit/{id}', [TermController::class, 'update']);
+    Route::get('admin/examinations/term/delete/{id}', [TermController::class, 'delete'])->name('admin.term.delete');
 
 
     Route::get('admin/attendance/student', [AttendanceController::class, 'AttendanceStudent']);

@@ -317,8 +317,8 @@
 @endsection
 
 @section('script')
-    <script type="text/javascript">
-    $(document).on('submit', '#submit_message', function(e) {
+  <script type="text/javascript">
+    $('body').on('submit', '#submit_message', function(e) {
         e.preventDefault();
 
         $.ajax({
@@ -328,25 +328,26 @@
             processData: false,
             contentType: false,
             dataType: 'json',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(data) {
-                $('#AppendMessage').append(data.success);
-                $('textarea[name="message"]').val(''); // clear input
-                scrolldown();
+            success: function(response) {
+                console.log(response);
+                if (response.success) {
+                    alert('Message sent successfully!');
+                    $('#AppendMessage').append(response.success);
+                    $('#ClearMessage').val('');
+                    scrolldown();
+                },
             },
             error: function(xhr) {
                 console.error(xhr.responseText);
-                alert('Failed to send message.');
-            }
+            },
         });
     });
-
-    function scrolldown() {
-      $('.chat-history').animate({
-         scrollTop: $('.chat-history').prop('scrollHeight') + 1000}, 500);
+    function scrolldown()
+    {
+            $('.chat-history').animate({scrollTop: $('.chat-history').prop("scrollHeight")+1000}, 500);
     }
     scrolldown();
-    </script>
+
+  </script>
+
 @endsection

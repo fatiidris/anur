@@ -13,6 +13,8 @@ use App\Models\ExamScheduleModel;
 use App\Models\MarksRegisterModel;
 use App\Models\AssignClassTeacherModel;
 use App\Models\MarksGradeModel;
+use App\Models\SessionModel;
+use App\Models\TermModel;
 use App\Models\SettingModel;
 
 
@@ -21,66 +23,94 @@ class ExaminationsController extends Controller
 {
     public function exam_list()
     {
+        $data['sessions'] = SessionModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+        $data['terms'] = TermModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
         $data['getRecord'] = ExamModel::getRecord();
         $data['header_title'] = "Exam List";
         return view('admin.examinations.exam.list', $data);
     }
     public function exam_add()
-    {  
+    {
         $data['header_title'] = "Add New Exam";
+        $data['sessions'] = SessionModel::where('is_delete', 0)->get();
+        $data['terms'] = TermModel::where('is_delete', 0)->get();
+
         return view('admin.examinations.exam.add', $data);
     }
     public function exam_insert(Request $request)
     {
-        $exam = new ExamModel;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'session_id' => 'required|exists:session,id', // FIXED
+            'term_id' => 'required|exists:term,id',       // FIXED
+        ]);
+
+        $exam = new ExamModel();
         $exam->name = trim($request->name);
-        $exam->note = trim($request->note);
-        $exam->created_by = Auth::user()->id;
+        $exam->session_id = $request->session_id;
+        $exam->term_id = $request->term_id;
+        $exam->created_by = Auth::id();
+        $exam->is_delete = $request->is_delete ?? 0;
         $exam->save();
-        return redirect('admin/examinations/exam/list')->with('success', "Exam Successfully Created");
+
+        return redirect('admin/examinations/exam/list')
+            ->with('success', "Exam Successfully Created");
     }
-    public function exam_edit($id)
-    {
-        $data['getRecord'] = ExamModel::getSingle($id);
-        
-        if (!empty($data['getRecord'])) {
-            $data['header_title'] = "Edit Exam";
-            return view('admin.examinations.exam.edit', $data);
-        } else {
-            abort(404);
-        }
-    } 
-    public function exam_update($id, Request $request)
+public function exam_edit($id)
 {
-    $exam = ExamModel::getSingle($id);
-    
-    if ($exam) {
-        $exam->name = trim($request->name);
-        $exam->note = trim($request->note);
-        $exam->created_by = Auth::user()->id;
-        $exam->save();
-        return redirect('admin/examinations/exam/list')->with('success', "Exam Successfully Updated");
+    // Get single exam with relationships (your getSingle() already does this)
+    $data['getRecord'] = ExamModel::getSingle($id);
+
+    if (!empty($data['getRecord'])) {
+        $data['header_title'] = "Edit Exam";
+
+        // Fetch sessions and terms for dropdowns
+        $data['sessions'] = SessionModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+        $data['terms'] = TermModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+
+        return view('admin.examinations.exam.edit', $data);
     } else {
         abort(404);
     }
 }
-    public function exam_delete($id)
-    {
-        $getRecord = ExamModel::getSingle($id);
-        if(!empty($getRecord))
-        {
-            $getRecord->is_delete = 1;
-            $getRecord->save();
-            
-            return redirect()->back()->with('success', "Exam Successfully Deleted");
-        }
-        else
-        {
+ 
+ public function exam_update($id, Request $request)
+  {
+    $request->validate([
+        'name'       => 'required|string|max:255',
+        'session_id' => 'required|integer|exists:session,id',
+        'term_id'    => 'required|integer|exists:term,id',
+    
+    ]);
 
-            abort(404);
-        }
+    $exam = ExamModel::getSingle($id);
 
-    } 
+    if ($exam) {
+        $exam->name       = trim($request->name);
+        $exam->session_id = $request->session_id; 
+        $exam->term_id    = $request->term_id;    
+        $exam->created_by = Auth::user()->id;
+        $exam->save();
+
+        return redirect('admin/examinations/exam/list')->with('success', "Exam Successfully Updated");
+    } else {
+        abort(404);
+    }
+ }
+ public function exam_delete($id)
+  {
+    $getRecord = ExamModel::getSingle($id);
+
+    if (!empty($getRecord)) {
+        $getRecord->is_delete = 1;
+        $getRecord->save();
+
+        return redirect()->back()->with('success', "Exam Successfully Deleted");
+    } else {
+        abort(404);
+    }
+  }
+     
     public function exam_schedule(Request $request)
     {
 
@@ -196,64 +226,80 @@ class ExaminationsController extends Controller
 
     }
     
-    public function submit_marks_register(Request $request)
-    {
+ public function submit_marks_register(Request $request)
+  {
+    $student_id = $request->student_id;
+    $exam_id = $request->exam_id;
+    $class_id = $request->class_id;
 
-        $validation = 0;
-    
-        if (!empty($request->mark)) {
-            foreach ($request->mark as $mark) {
-                $getExamSchedule = ExamScheduleModel::getSingle($mark['id']);
-                $full_marks = $getExamSchedule->full_marks;
-    
-                $ca1 = !empty($mark['ca1']) ? $mark['ca1'] : 0;
-                $ca2 = !empty($mark['ca2']) ? $mark['ca2'] : 0;
-                $ca3 = !empty($mark['ca3']) ? $mark['ca3'] : 0;
-                $exam = !empty($mark['exam']) ? $mark['exam'] : 0;
-    
-                $full_marks = !empty($mark['full_marks']) ? $mark['full_marks'] : 0;
-                $passing_mark = !empty($mark['passing_mark']) ? $mark['passing_mark'] : 0;
-                
-                $total_mark = $ca1 + $ca2 + $ca3 + $exam;
-    
-                if ($total_mark > $full_marks) {
-                    $validation = 1; // Flag validation error
-                    continue; // Skip saving if invalid
-                }
-    
-                // Check if mark already exists
-                $getMark = MarksRegisterModel::CheckAlreadyMark($request->student_id, $request->exam_id, $request->class_id, $mark['subject_id']);
-                if ($getMark) {
-                    $save = $getMark;
-                } else {
-                    $save = new MarksRegisterModel;
-                    $save->created_by = Auth::user()->id;
-                }                
-                
-                // Save mark data
-                $save->student_id = $request->student_id;
-                $save->exam_id    = $request->exam_id;
-                $save->class_id   = $request->class_id;
-                $save->subject_id = $mark['subject_id'];
-                $save->ca1 = $ca1;
-                $save->ca2  = $ca2;
-                $save->ca3  = $ca3;
-                $save->exam       = $exam;
-                $save->full_marks = $full_marks;
-                $save->passing_mark = !empty($mark['passing_mark']) ? $mark['passing_mark'] : 0;
-                $save->save();
+    $validation = 0;
+
+    if (!empty($request->mark)) {
+        foreach ($request->mark as $mark) {
+            $getExamSchedule = ExamScheduleModel::getSingle($mark['id']);
+            $full_marks = $getExamSchedule->full_marks;
+
+            $ca1 = $mark['ca1'] ?? 0;
+            $ca2 = $mark['ca2'] ?? 0;
+            $ca3 = $mark['ca3'] ?? 0;
+            $exam = $mark['exam'] ?? 0;
+
+            $total_mark = $ca1 + $ca2 + $ca3 + $exam;
+
+            if ($total_mark > $full_marks) {
+                $validation = 1; // Flag validation error
+                continue; // Skip saving if invalid
             }
+
+            // Check if mark already exists
+            $getMark = MarksRegisterModel::CheckAlreadyMark(
+                $student_id,
+                $exam_id,
+                $class_id,
+                $mark['subject_id']
+            );
+
+            $save = $getMark ?: new MarksRegisterModel;
+            if (!$getMark) {
+                $save->created_by = Auth::user()->id;
+            }
+
+            $save->student_id = $student_id;
+            $save->exam_id    = $exam_id;
+            $save->class_id   = $class_id;
+            $save->subject_id = $mark['subject_id'];
+            $save->ca1 = $ca1;
+            $save->ca2 = $ca2;
+            $save->ca3 = $ca3;
+            $save->exam = $exam;
+            $save->full_marks = $full_marks;
+            $save->passing_mark = $mark['passing_mark'] ?? 0;
+            $save->total_score = $total_mark; // Ensure you have this column
+            $save->save();
+
+            // ===== Calculate Position for this subject =====
+            $allScores = MarksRegisterModel::where('exam_id', $exam_id)
+                ->where('class_id', $class_id)
+                ->where('subject_id', $mark['subject_id'])
+                ->pluck('total_score')
+                ->sortDesc()
+                ->values()
+                ->toArray();
+
+            $position = array_search($total_mark, $allScores);
+            $save->position = $position !== false ? $position + 1 : null;
+            $save->save();
         }
-    
-        // Generate response message
-        return response()->json([
-            'status' => 'success',
-            'message' => ($validation == 0) 
-                ? "Mark Register Successfully Saved" 
-                : "Mark Register Successfully Saved. However, some marks were not saved because they exceeded full marks."
-        ]);        
     }
-    
+
+    return response()->json([
+        'status' => 'success',
+        'message' => ($validation == 0)
+            ? "Mark Register Successfully Saved"
+            : "Mark Register Successfully Saved. However, some marks were not saved because they exceeded full marks."
+    ]);
+  }
+
         public function single_submit_marks_register(Request $request)
         {
             $id = $request->id;

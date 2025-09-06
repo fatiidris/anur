@@ -104,7 +104,7 @@
                                           $getMark = $subject->getMark($student->id, Request::get('exam_id'), Request::get('class_id'), $subject->subject_id);
                                           
                                           if (!empty($getMark)) {
-                                              $totalMark = $getMark->class_work + $getMark->home_work + $getMark->test_work + $getMark->exam;
+                                              $totalMark = $getMark->ca1 + $getMark->ca2 + $getMark->ca3 + $getMark->exam;
                                           }
 
                                           $totalStudentMark = $totalStudentMark + $totalMark;
@@ -112,28 +112,27 @@
                                       
                                       <td>
                                           <div style="margin-bottom: 10px;">
-                                              Class Work
-
+                                                CA1
                                               <input type="hidden" name="mark[{{ $i }}][full_marks]" value="{{ $subject->full_marks }}">
                                               <input type="hidden" name="mark[{{ $i }}][passing_mark	]" value="{{ $subject->passing_mark	 }}">
                                               <input type="hidden" name="mark[{{ $i }}][id]" value="{{ $subject->id }}">
                                               <input type="hidden" name="mark[{{ $i }}][subject_id]" value="{{ $subject->subject_id }}">
-                                              <input type="text" style="width: 200px;" name="mark[{{ $i }}][class_work]" id="class_work_{{ $student->id }}{{ $subject->subject_id }}" 
-                                                  value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}" 
+                                              <input type="text" style="width: 200px;" name="mark[{{ $i }}][ca1]" id="ca1_{{ $student->id }}{{ $subject->subject_id }}" 
+                                                  value="{{ !empty($getMark->ca1) ? $getMark->ca1 : '' }}" 
                                                   placeholder="Enter Marks" class="form-control">
                                           </div>
 
                                           <div style="margin-bottom: 10px;">
-                                              Home Work
-                                              <input type="text" style="width: 200px;" id="home_work_{{ $student->id }}{{ $subject->subject_id }}" name="mark[{{ $i }}][home_work]" 
-                                                  value="{{ !empty($getMark->home_work) ? $getMark->home_work : '' }}" 
+                                              CA2
+                                              <input type="text" style="width: 200px;" id="ca2_{{ $student->id }}{{ $subject->subject_id }}" name="mark[{{ $i }}][ca2]" 
+                                                  value="{{ !empty($getMark->ca2) ? $getMark->ca2 : '' }}" 
                                                   placeholder="Enter Marks" class="form-control">
                                           </div>
 
                                           <div style="margin-bottom: 10px;">
-                                              Test Work
-                                              <input type="text" style="width: 200px;" id="test_work_{{ $student->id }}{{ $subject->subject_id }}" name="mark[{{ $i }}][test_work]" 
-                                                  value="{{ !empty($getMark->test_work) ? $getMark->test_work : '' }}" 
+                                              CA3
+                                              <input type="text" style="width: 200px;" id="ca3_{{ $student->id }}{{ $subject->subject_id }}" name="mark[{{ $i }}][ca3]" 
+                                                  value="{{ !empty($getMark->ca3) ? $getMark->ca3 : '' }}" 
                                                   placeholder="Enter Marks" class="form-control">
                                           </div>
 
@@ -249,9 +248,9 @@
     var class_id = $(this).attr('data-class');
     var id = $(this).attr('data-schedule');
   
-    var class_work = $('#class_work_'+student_id+subject_id).val();
-    var home_work = $('#home_work_'+student_id+subject_id).val();
-    var test_work = $('#test_work_'+student_id+subject_id).val();
+    var ca1 = $('#ca1_'+student_id+subject_id).val();
+    var ca2 = $('#ca2_'+student_id+subject_id).val();
+    var ca3 = $('#ca3_'+student_id+subject_id).val();
     var exam = $('#exam_'+student_id+subject_id).val();
     
     $.ajax({
@@ -264,9 +263,9 @@
           subject_id : subject_id,
           exam_id : exam_id,
           class_id : class_id,
-          class_work : class_work,
-          home_work : home_work,
-          test_work : test_work,
+          ca1 : ca1,
+          ca2 : ca2,
+          ca3 : ca3,
           exam : exam
         },
         dataType: "json",

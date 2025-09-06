@@ -4,62 +4,130 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Request;
+use Illuminate\Support\Facades\Request;
 
 class ExamModel extends Model
 {
     use HasFactory;
     
     protected $table = 'exam';
-    protected $fillable = ['name', 'note', 'created_by', 'is_delete'];
 
+    // Allow mass assignment
+    protected $fillable = [
+        'name',       // Existing exam name field
+        'note',
+        'created_by',
+        'term_id',    // Link to term
+        'session_id', // NEW: Direct link to session
+        'is_delete'
+    ];
 
-    // Get single record (only non-deleted by default)
+    /**
+     * Exam belongs to a Term
+     */
+    public function term()
+    {
+        return $this->belongsTo(TermModel::class, 'term_id');
+    }
+
+    /**
+     * Exam belongs to a Session
+     */
+    public function session()
+    {
+        return $this->belongsTo(SessionModel::class, 'session_id');
+    }
+
+    /**
+     * Exam created by a User
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Combine Term and Session dynamically
+     */
+    public function getFullExamNameAttribute()
+    {
+        $termName = $this->term->name ?? '';
+        $sessionName = $this->session->name ?? '';
+        return trim($termName . ', ' . $sessionName);
+    }
+
+    /**
+     * Get single exam with relationships
+     */
     static public function getSingle($id)
     {
-        return self::find($id);
+        return self::with(['term', 'session', 'creator'])
+                   ->where('id', $id)
+                   ->where('is_delete', 0)
+                   ->first();
     }
 
-    // Get paginated records (filtered by name or date)
+    /**
+     * Get paginated exam records (with filters)
+     */
     static public function getRecord()
     {
-        $return = self::select('exam.*', 'users.name as created_name')
-                     ->join('users', 'users.id', '=', 'exam.created_by');
-                    
+        $query = self::select(
+                    'exam.*',
+                    'users.name as created_name',
+                    'term.name as term_name',
+                    'session.name as session_name'
+                )
+                ->leftJoin('users', 'users.id', '=', 'exam.created_by')
+                ->leftJoin('term', 'term.id', '=', 'exam.term_id')
+                ->leftJoin('session', 'session.id', '=', 'exam.session_id')
+                ->where('exam.is_delete', 0)
+                ->orderBy('exam.id', 'desc');
 
-                    if(!empty(Request::get('name'))) 
-                    {
-                        $return = $return->where('exam.name', 'like', '%' .Request::get('name') .'%');
-                    }
+        // Search filters
+        if (!empty(Request::get('name'))) {
+            $query->where('exam.name', 'like', '%' . Request::get('name') . '%');
+        }
 
-                    if(!empty(Request::get('date'))) 
-                    {
-                        $return = $return->whereDate('exam.created_at', '=', Request::get('date'));
-                    }
+        if (!empty(Request::get('session_id'))) {
+            $query->where('exam.session_id', Request::get('session_id'));
+        }
 
-                    $return = $return->where('exam.is_delete', '=',0)
-                    ->orderBy('exam.id', 'desc')
-                    ->paginate(50);
-        return  $return;            
-                }
+        if (!empty(Request::get('term_id'))) {
+            $query->where('exam.term_id', Request::get('term_id'));
+        }
 
-    // Get list of active exams (for dropdowns or selection)
-    static public function getExam()
-    {
-        $return = self::select('exam.*')
-                   ->join('users', 'users.id', '=', 'exam.created_by')
-                   ->where('exam.is_delete','=', 0)
-                   ->orderBy('exam.name', 'asc')
-                   ->get();
-        return $return;           
+        if (!empty(Request::get('date'))) {
+            $query->whereDate('exam.created_at', '=', Request::get('date'));
+        }
+
+        return $query->paginate(50);
     }
 
+    /**
+     * Get all active exams (for dropdowns)
+     */
+    static public function getExam()
+    {
+        return self::with(['term', 'session'])
+                   ->where('is_delete', 0)
+                   ->orderBy('name', 'asc')
+                   ->get();
+    }
+
+    /**
+     * Soft delete exam
+     */
+    static public function softDelete($id)
+    {
+        return self::where('id', $id)->update(['is_delete' => 1]);
+    }
+
+    /**
+     * Get total active exams
+     */
     static public function getTotalExam()
     {
-        $return = self::select('exam.id')
-                   ->join('users', 'users.id', '=', 'exam.created_by')
-                   ->where('exam.is_delete','=', 0)
-                   ->count();
-        return $return;           
+        return self::where('is_delete', 0)->count();
     }
 }

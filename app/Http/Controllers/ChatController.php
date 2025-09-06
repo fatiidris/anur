@@ -23,6 +23,7 @@ class ChatController extends Controller
                 exit();
             }
             
+            ChatModel::UpdateCount($sender_id, $receiver_id);
             $data['getReceiver'] = User::getSingle($receiver_id);
             $data['getChat'] = ChatModel::getChat($receiver_id, $sender_id);  
         }
@@ -36,19 +37,20 @@ class ChatController extends Controller
 public function submit_message(Request $request)
 {
     $chat = new ChatModel();
-    $chat->sender_id = Auth::user()->id;
+    $chat->sender_id = Auth::id();
     $chat->receiver_id = $request->receiver_id;
     $chat->message = $request->message;
-    $chat->created_date = now();
+    $chat->created_date = time(); // keep as integer timestamp
     $chat->save();
 
-    $getChat = ChatModel::where('id', $chat->id)->get();
+    $getChat = ChatModel::where('id', '=', $chat->id)->get();
 
     return response()->json([
-        "status" => true,
-        "success" => view('chat._single', [
-            "getChat" => $getChat
+        'status'  => true,
+        'success' => view('chat._single', [
+           "getChat" => $getChat
         ])->render(),
+        
     ], 200);
 }
 

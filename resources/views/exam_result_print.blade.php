@@ -129,8 +129,8 @@
 
 <table class="small-table">
     <tr>
-        <td>Session: {{ $getSetting->session_name ?? '2023/2024' }}</td>
-        <td>{{ $getExam->name ?? '-' }}</td>
+        <td>Session: {{ $getExam->session->name ?? 'N/A' }}</td>
+        <td>Term: {{ $getExam->term->name ?? 'N/A' }}</td>
         <td>Report Date: {{ \Carbon\Carbon::now()->format('jS F Y') }}</td>
         <td>No. of Days Present: {{ $getStudent->getDaysPresent() }}</td>
         <td>No. of Days Absent: {{ $getStudent->getDaysAbsent() }}</td>
@@ -158,15 +158,25 @@
     <tbody>
       @foreach($getExamMarks as $exam)
         @php
-          $subject = $exam['subject_name'] ?? 'Unknown';
-          $ca1 = $exam['class_work'] ?? ($exam['ca1'] ?? '-');
-          $ca2 = $exam['home_work'] ?? ($exam['ca2'] ?? '-');
-          $ca3 = $exam['test_work'] ?? ($exam['ca3'] ?? '-');
-          $examScore = $exam['exam'] ?? '-';
-          $total = isset($exam['total_score']) ? $exam['total_score'] : 0;
-          $stats = $subjectStats[$subject] ?? ['average'=>0,'lowest'=>0,'highest'=>0];
-          $grade = getLetterGrade((float)$total);
+            $subject = $exam->subject_name ?? 'Unknown';
+            $ca1 = $exam->ca1 ?? '-';
+            $ca2 = $exam->ca2 ?? '-';
+            $ca3 = $exam->ca3 ?? '-';
+            $examScore = $exam->exam ?? '-';
+            $total = $exam->total_score ?? 0;
+            $stats = $subjectStats[$subject] ?? ['average'=>0,'lowest'=>0,'highest'=>0];
+            $grade = getLetterGrade((float)$total);
+
+            // Subject position calculation (fixed)
+           $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
+              Request::get('exam_id'),
+              Request::get('class_id'),
+              $student_id,
+              
+              $getStudent->id 
+          );
         @endphp
+
         <tr>
           <td>{{ $subject }}</td>
           <td>{{ $ca1 }}</td>
@@ -175,14 +185,14 @@
           <td>{{ $examScore }}</td>
           <td>{{ $total }}</td>
           <td>{{ $grade }}</td>
-          <td>{{ $exam['position'] ?? '-' }}</td>
+          <td>{{ $subjectPosition }}</td>
           <td>{{ $stats['average'] }}</td>
           <td>{{ $stats['lowest'] }}</td>
           <td>{{ $stats['highest'] }}</td>
         </tr>
       @endforeach
     </tbody>
-  </table>
+</table>
 
   {{-- COMMENTS, STATS & RATINGS --}}
   <div class="three-col">
@@ -265,7 +275,7 @@
 @endif
   </div>
    <script type="text/javascript">
-       window.print();
+      // window.print();
     </script>
 </body>
 </html>
