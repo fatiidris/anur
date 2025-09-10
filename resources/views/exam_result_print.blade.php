@@ -156,86 +156,118 @@
       </tr>
     </thead>
     <tbody>
-      @foreach($getExamMarks as $exam)
-        @php
-            $subject = $exam->subject_name ?? 'Unknown';
-            $ca1 = $exam->ca1 ?? '-';
-            $ca2 = $exam->ca2 ?? '-';
-            $ca3 = $exam->ca3 ?? '-';
-            $examScore = $exam->exam ?? '-';
-            $total = $exam->total_score ?? 0;
-            $stats = $subjectStats[$subject] ?? ['average'=>0,'lowest'=>0,'highest'=>0];
-            $grade = getLetterGrade((float)$total);
+@foreach($getExamMarks as $exam)
+    @php
+        $subject = $exam['subject_name'];
+        $ca1 = $exam['ca1'];
+        $ca2 = $exam['ca2'];
+        $ca3 = $exam['ca3'];
+        $examScore = $exam['exam'];
+        $total = $exam['total_score'];
+        $stats = $subjectStats[$subject] ?? ['average'=>0,'lowest'=>0,'highest'=>0];
+        $grade = getLetterGrade((float)$total);
 
-            // Subject position calculation (fixed)
-           $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
-              Request::get('exam_id'),
-              Request::get('class_id'),
-              $student_id,
-              
-              $getStudent->id 
-          );
-        @endphp
+        // ✅ Fix: Ensure IDs are consistent
+        $examId = Request::get('exam_id') ?? ($exam['exam_id'] ?? null);
+        $classId = Request::get('class_id') ?? ($getClass->id ?? null);
+        $subjectId = $exam['subject_id'];
+        $studentId = $getStudent->id;
 
-        <tr>
-          <td>{{ $subject }}</td>
-          <td>{{ $ca1 }}</td>
-          <td>{{ $ca2 }}</td>
-          <td>{{ $ca3 }}</td>
-          <td>{{ $examScore }}</td>
-          <td>{{ $total }}</td>
-          <td>{{ $grade }}</td>
-          <td>{{ $subjectPosition }}</td>
-          <td>{{ $stats['average'] }}</td>
-          <td>{{ $stats['lowest'] }}</td>
-          <td>{{ $stats['highest'] }}</td>
-        </tr>
-      @endforeach
-    </tbody>
+        $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
+            $examId,
+            $classId,
+            $subjectId,
+            $studentId
+        );
+    @endphp
+
+    <tr>
+      <td>{{ $subject }}</td>
+      <td>{{ $ca1 }}</td>
+      <td>{{ $ca2 }}</td>
+      <td>{{ $ca3 }}</td>
+      <td>{{ $examScore }}</td>
+      <td>{{ $total }}</td>
+      <td>{{ $grade }}</td>
+      <td>{{ $subjectPosition }}</td>
+      <td>{{ $stats['average'] }}</td>
+      <td>{{ $stats['lowest'] }}</td>
+      <td>{{ $stats['highest'] }}</td>
+    </tr>
+@endforeach
+
+</tbody>
+
 </table>
 
-  {{-- COMMENTS, STATS & RATINGS --}}
-  <div class="three-col">
+{{-- COMMENTS, STATS & RATINGS --}}
+@php
+    $remark = \App\Models\StudentReportRemark::where('student_id', $getStudent->id)
+        ->where('class_id', $getClass->id)
+        ->where('term_id', $getExam->term_id ?? null)
+        ->where('session_id', $getExam->session_id ?? null)
+        ->first();
+
+    // Decode skills and behaviour JSON if exists
+    $skills = !empty($remark->skills) ? json_decode($remark->skills, true) : [];
+    $behaviours = !empty($remark->behaviour) ? json_decode($remark->behaviour, true) : [];
+
+    // Auto-generate comments if not provided
+    $teacherComment = $remark->teacher_comment ?? (
+        $Percentage >= 70 ? 'Excellent performance — keep it up.' :
+        ($Percentage >= 50 ? 'Good performance — needs improvement in some areas.' :
+        'Work harder to improve next term.')
+    );
+
+    $principalComment = $remark->principal_comment ?? (
+        $Percentage >= 70 ? 'Highly commendable result.' :
+        ($Percentage >= 50 ? 'Satisfactory result, but more effort is required.' :
+        'Below expectations — encourage greater focus.')
+    );
+@endphp
+
+ <div class="three-col">
     <table>
-      <tr><th>Class Teacher's Comment</th></tr>
-      <tr><td>An excellent performance — keep it up.</td></tr>
-      <tr><th>Principal Comment</th></tr>
-      <tr><td>Highly commendable result.</td></tr>
-      <tr><th>Summary</th></tr>
-      <tr><td>Percentage: {{ round($Percentage, 2) }}%</td></tr>
-      <tr><td>Overall Average: {{ $overallAverage }}</td></tr>
+        <tr><th>Class Teacher's Comment</th></tr>
+        <tr><td>{{ $teacherComment }}</td></tr>
+        <tr><th>Principal Comment</th></tr>
+        <tr><td>{{ $principalComment }}</td></tr>
+        <tr><th>Summary</th></tr>
+        <tr><td>Percentage: {{ round($Percentage, 2) }}%</td></tr>
+        <tr><td>Overall Average: {{ $overallAverage }}</td></tr>
     </table>
 
     <table>
-      <tr><th>Skills and Behaviour</th></tr>
-      <tr><td>4</td><td>Attentiveness</td></tr>
-      <tr><td>4</td><td>Perseverance</td></tr>
-      <tr><td>4</td><td>Promptness in Completing Work</td></tr>
-      <tr><td>4</td><td>Communication Skills</td></tr>
-      <tr><td>4</td><td>Handwriting</td></tr>
-      <tr><td>4</td><td>Punctuality</td></tr>
-      <tr><td>4</td><td>Neatness</td></tr>
-      <tr><td>4</td><td>Politeness</td></tr>
-      <tr><td>4</td><td>Honesty</td></tr>
-      <tr><td>4</td><td>Self Control</td></tr>
-    </table>
+    <tr><th colspan="2">Skills and Behaviour</th></tr>
+    <tr><td><strong>Skill/Behaviour</strong></td><td><strong>Rating</strong></td></tr>
+    @if(!empty($skills) || !empty($behaviours))
+        @foreach(array_merge($skills, $behaviours) as $item)
+            <tr>
+                <td>{{ $item['name'] ?? '-' }}</td>
+                <td>{{ $item['rating'] ?? '-' }}</td>
+            </tr>
+        @endforeach
+    @else
+        <tr><td colspan="2">No ratings available</td></tr>
+    @endif
+</table>
 
     <table>
-      <tr><th>Keys to Ratings</th></tr>
-      <tr><td>5</td><td>Excellent</td></tr>
-      <tr><td>4</td><td>Very Good</td></tr>
-      <tr><td>3</td><td>Satisfactory</td></tr>
-      <tr><td>2</td><td>Fair</td></tr>
-      <tr><td>1</td><td>Poor</td></tr>
-      <tr><th>Grading System</th></tr>
-      <tr><td>70+</td><td>A - Distinction</td></tr>
-      <tr><td>60 - 69</td><td>B - Very Good</td></tr>
-      <tr><td>50 - 59</td><td>C - Credit</td></tr>
-      <tr><td>45 - 49</td><td>D - Pass</td></tr>
-      <tr><td>40 - 44</td><td>E - Fair</td></tr>
-      <tr><td>0 - 39</td><td>Fail</td></tr>
+        <tr><th>Keys to Ratings</th></tr>
+        <tr><td>5</td><td>Excellent</td></tr>
+        <tr><td>4</td><td>Very Good</td></tr>
+        <tr><td>3</td><td>Satisfactory</td></tr>
+        <tr><td>2</td><td>Fair</td></tr>
+        <tr><td>1</td><td>Poor</td></tr>
+        <tr><th>Grading System</th></tr>
+        <tr><td>70+</td><td>A - Distinction</td></tr>
+        <tr><td>60 - 69</td><td>B - Very Good</td></tr>
+        <tr><td>50 - 59</td><td>C - Credit</td></tr>
+        <tr><td>45 - 49</td><td>D - Pass</td></tr>
+        <tr><td>40 - 44</td><td>E - Fair</td></tr>
+        <tr><td>0 - 39</td><td>Fail</td></tr>
     </table>
-  </div>
+ </div>
 
   {{-- SIGNATURE & PAYMENT STATUS --}}
   <div class="signature-row">

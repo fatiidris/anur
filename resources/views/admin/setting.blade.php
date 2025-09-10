@@ -29,7 +29,7 @@
                 {{ csrf_field() }}
                 <div class="card-body">
                   <div class="form-group">
-                    <label>Paypal Business Email</label>
+                    <label>Paystack Business Email</label>
                     <input type="email" class="form-control" name="paystack_secret" value= "{{ $getRecord->paypal_email }}" required placeholder="Paypal Business Email">
                   </div>
 

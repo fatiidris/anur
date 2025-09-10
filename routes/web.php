@@ -193,6 +193,7 @@ Route::group(['middleware' => 'admin'], function(){
     Route::get('admin/examinations/marks_grade/edit/{id}', [ExaminationsController::class, 'marks_grade_edit']);
     Route::post('admin/examinations/marks_grade/edit/{id}', [ExaminationsController::class, 'marks_grade_update']);
     Route::get('admin/examinations/marks_grade/delete/{id}', [ExaminationsController::class, 'marks_grade_delete']);
+    
     Route::get('admin/my_exam_result/print', [ExaminationsController::class, 'MyExamResultPrint']);
 
     // session url
@@ -271,6 +272,10 @@ Route::group(['middleware' => 'admin'], function(){
     Route::post('teacher/submit_marks_register', [ExaminationsController::class, 'submit_marks_register']);
     Route::post('teacher/single_submit_marks_register', [ExaminationsController::class, 'single_submit_marks_register']);
     Route::get('teacher/my_exam_result/print', [ExaminationsController::class, 'MyExamResultPrint']);
+
+    Route::get('teacher/remarks_report', [ExaminationsController::class, 'reportRemark']);
+    Route::post('teacher/remarks_report_save', [ExaminationsController::class, 'saveReportRemark']);
+    
 
     Route::get('teacher/attendance/student', [AttendanceController::class, 'AttendanceStudentTeacher']);
     Route::post('teacher/attendance/student/save', [AttendanceController::class, 'AttendanceStudentSubmit']);

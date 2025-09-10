@@ -16,6 +16,8 @@ use App\Models\MarksGradeModel;
 use App\Models\SessionModel;
 use App\Models\TermModel;
 use App\Models\SettingModel;
+use App\Models\StudentReportRemark;
+
 
 
 
@@ -434,7 +436,7 @@ public function exam_edit($id)
             $data['header_title'] = "My Exam Timetable";
             return view('student.my_exam_timetable', $data);
         }
-public function MyExamResult()
+     public function MyExamResult()
     {
         $studentId = Auth::user()->id;
         $result = [];
@@ -510,6 +512,7 @@ public function MyExamResult()
                 {
                     $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam']; 
                     $dataS = array();
+                    $dataS['subject_id'] = $exam['subject_id'];
                     $dataS['subject_name'] = $exam['subject_name'];
                     $dataS['ca1'] = $exam['ca1'];
                     $dataS['ca2'] =  $exam['ca2'];
@@ -575,6 +578,74 @@ public function MyExamResult()
 
     }
 
+public function reportRemark(Request $request)
+{
+    // Get classes assigned to the logged-in teacher
+    $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
+    $assignedClassIds = AssignClassTeacherModel::where('teacher_id', Auth::user()->id)
+        ->where('status', 0) // Assuming 0 = active, adjust if different
+        ->pluck('class_id');
+
+    $data['getClass'] = ClassModel::whereIn('id', $assignedClassIds)
+        ->where('is_delete', 0)
+        ->get();
+
+    $data['getTerms'] = TermModel::all();
+    $data['getSessions'] = SessionModel::all();
+    $data['students'] = collect();
+    $data['existingRemarks'] = [];
+
+    if ($request->has(['class_id', 'term_id', 'session_id'])) {
+        // Ensure the teacher is assigned to the requested class
+        if ($assignedClassIds->contains($request->class_id)) {
+            $data['students'] = User::where('class_id', $request->class_id)
+                ->where('is_delete', 0)
+                ->get();
+
+            $remarks = StudentReportRemark::where('class_id', $request->class_id)
+                ->where('term_id', $request->term_id)
+                ->where('session_id', $request->session_id)
+                ->get()
+                ->keyBy('student_id');
+
+            $data['existingRemarks'] = $remarks;
+        }
+    }
+
+    return view('teacher.report_remark', $data);
+}
+public function saveReportRemark(Request $request)
+{
+    $request->validate([
+        'remarks' => 'required|array',
+    ]);
+
+    foreach ($request->remarks as $studentId => $remarkData) {
+        // Ensure required fields exist
+        if (!isset($remarkData['class_id'], $remarkData['term_id'], $remarkData['session_id'])) {
+            continue; // Skip if essential IDs are missing
+        }
+
+        \App\Models\StudentReportRemark::updateOrCreate(
+            [
+                'student_id' => $studentId, // we already know the student_id from array key
+                'class_id' => $remarkData['class_id'],
+                'term_id' => $remarkData['term_id'],
+                'session_id' => $remarkData['session_id'],
+            ],
+            [
+                // Save skills & behaviours as JSON (so multiple ratings fit in one column)
+                'skills' => isset($remarkData['skills']) ? json_encode($remarkData['skills']) : null,
+                'behaviours' => isset($remarkData['behaviours']) ? json_encode($remarkData['behaviours']) : null,
+
+                'teacher_comment' => $remarkData['teacher_comment'] ?? null,
+                'principal_comment' => $remarkData['principal_comment'] ?? null,
+            ]
+        );
+    }
+
+    return redirect('teacher/remarks_report')->with('success', "All student remarks saved successfully");
+}
     //parent side
     public function ParentMyExamTimetable($student_id)
     {

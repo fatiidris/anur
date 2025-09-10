@@ -417,6 +417,15 @@
             </a>
             </li>
 
+             <li class="nav-item">
+            <a href="{{ url ('teacher/remarks_report') }}" class="nav-link @if(Request::segment(2) == 'remarks_report') active @endif">
+              <i class="nav-icon far fa-user"></i>
+              <p>
+              Skilles and Behaviour
+              </p>
+            </a>
+            </li>
+            
             <li class="nav-item  @if(Request::segment(2) == 'attendance')  menu-is-opening menu-open  @endif">
             <a href="#" class="nav-link @if(Request::segment(2) == 'attendance')  active  @endif">
               <i class="nav-icon fas fa-table"></i>

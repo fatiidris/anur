@@ -108,6 +108,14 @@
                                           }
 
                                           $totalStudentMark = $totalStudentMark + $totalMark;
+                                          
+                                           // Subject position calculation
+                                           $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
+                                              Request::get('exam_id'),
+                                              Request::get('class_id'),
+                                              $subject->subject_id,
+                                              $student->id
+                                          );
                                       @endphp
                                       
                                       <td>
@@ -152,17 +160,18 @@
                                                   Save
                                               </button>
                                           </div>
-                                          @if(!empty($getMark)) 
+                                           @if(!empty($getMark)) 
                                             <div style="margin-bottom: 10px;">
+                                            <b> Total Mark :</b>{{ $totalMark }} <br>
+                                            <b> Passing Mark : </b>{{ $subject->passing_mark }} <br>
+                                            <b>Position:</b> {{ $subjectPosition }} <br>
                                             @php
                                                $getLoopGrade = App\Models\MarksGradeModel::getGrade($totalMark);
                                             @endphp
-                                            <b> Total Mark :</b>{{ $totalMark }} <br>
-                                            <b> Passing Mark :</b>{{ $subject->passing_mark }} <br>
                                             @if(!empty($getLoopGrade))
                                                <b> Grade : </b>{{ $getLoopGrade }} <br>
                                             @endif
-                                            @if( $totalMark >= $subject->passing_mark ) 
+                                            @if($totalMark >= $subject->passing_mark) 
                                               <span style="color: green;font-weight: bold ">Pass</span>
                                             @else
                                               <span style="color: red; font-weight: bold">Fail</span>
@@ -178,10 +187,11 @@
                                     @endphp
                                   @endforeach
 
+
                                   <td style="min-width: 250px;">
                                       <button type="submit" class="btn btn-success">Save</button>
                                       <a class="btn btn-primary" target="_blanck" href="{{ url('teacher/my_exam_result/print?exam_id='.Request::get('exam_id').'&student_id='.$student->id) }}">Print</a>
-                                      @if(!empty($totalStudentMark))
+                                       @if(!empty($totalStudentMark))
                                           <br>
                                           <b>Total Subject Mark : </b>{{ $totalFullMarks }}
                                           <br>
