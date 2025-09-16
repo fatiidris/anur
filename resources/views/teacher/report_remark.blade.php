@@ -33,7 +33,7 @@
                     <div class="form-group col-md-3">
                         <label>Term</label>
                         <select name="term_id" class="form-control" required>
-                            <option value="">Select</option>
+                            <option value="">Select Term</option>
                             @foreach($getTerms as $term)
                                 <option value="{{ $term->id }}" 
                                     {{ Request::get('term_id') == $term->id ? 'selected' : '' }}>
@@ -87,46 +87,52 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($students as $student)
-                            @php
-                                $remark = $existingRemarks[$student->id] ?? null;
-                            @endphp
-                            <tr>
-                                <td>{{ $student->name }} {{ $student->last_name }}</td>
+                      @foreach($students as $student)
+                        @php
+                            $remark = $existingRemarks[$student->id] ?? null;
+                        @endphp
+                        <tr>
+                            <td>{{ $student->name }} {{ $student->last_name }}</td>
 
-                                <td>
-                                    <strong>Skills</strong><br>
-                                    @foreach(['attentiveness','perseverance','promptness','communication','handwriting'] as $skill)
-                                        <label class="d-block text-capitalize">{{ $skill }}</label>
-                                        <input type="number" name="remarks[{{ $student->id }}][skills][{{ $skill }}]" 
-                                            class="form-control mb-2" min="1" max="5" 
-                                            value="{{ $remark->skills[$skill] ?? '' }}">
-                                    @endforeach
-                                </td>
+                            <!-- Hidden fields to send class, term, session -->
+                            <input type="hidden" name="remarks[{{ $student->id }}][class_id]" value="{{ Request::get('class_id') }}">
+                            <input type="hidden" name="remarks[{{ $student->id }}][term_id]" value="{{ Request::get('term_id') }}">
+                            <input type="hidden" name="remarks[{{ $student->id }}][session_id]" value="{{ Request::get('session_id') }}">
 
-                                <td>
-                                    <strong>Behaviours</strong><br>
-                                    @foreach(['punctuality','neatness','politeness','honesty','self_control'] as $behaviour)
-                                        <label class="d-block text-capitalize">{{ str_replace('_',' ',$behaviour) }}</label>
-                                        <input type="number" name="remarks[{{ $student->id }}][behaviours][{{ $behaviour }}]" 
-                                            class="form-control mb-2" min="1" max="5" 
-                                            value="{{ $remark->behaviours[$behaviour] ?? '' }}">
-                                    @endforeach
-                                </td>
+                            <td>
+                                <strong>Skills</strong><br>
+                                @foreach(['attentiveness','perseverance','promptness','communication','handwriting'] as $skill)
+                                    <label class="d-block text-capitalize">{{ $skill }}</label>
+                                    <input type="number" name="remarks[{{ $student->id }}][skills][{{ $skill }}]" 
+                                        class="form-control mb-2" min="1" max="5" 
+                                        value="{{ isset($remark->skills[$skill]) ? $remark->skills[$skill] : '' }}">
+                                @endforeach
+                            </td>
 
-                                <td>
-                                    <textarea name="remarks[{{ $student->id }}][teacher_comment]" 
-                                        class="form-control auto-comment-teacher" rows="2"
-                                        data-student="{{ $student->id }}">{{ $remark->teacher_comment ?? '' }}</textarea>
-                                </td>
+                            <td>
+                                <strong>Behaviours</strong><br>
+                                @foreach(['punctuality','neatness','politeness','honesty','self_control'] as $behaviour)
+                                    <label class="d-block text-capitalize">{{ str_replace('_',' ',$behaviour) }}</label>
+                                    <input type="number" name="remarks[{{ $student->id }}][behaviour][{{ $behaviour }}]" 
+                                        class="form-control mb-2" min="1" max="5" 
+                                        value="{{ isset($remark->behaviour[$behaviour]) ? $remark->behaviour[$behaviour] : '' }}">
+                                @endforeach
+                            </td>
 
-                                <td>
-                                    <textarea name="remarks[{{ $student->id }}][principal_comment]" 
-                                        class="form-control auto-comment-principal" rows="2"
-                                        data-student="{{ $student->id }}">{{ $remark->principal_comment ?? '' }}</textarea>
-                                </td>
-                            </tr>
-                        @endforeach
+                            <td>
+                                <textarea name="remarks[{{ $student->id }}][teacher_comment]" 
+                                    class="form-control auto-comment-teacher" rows="2"
+                                    data-student="{{ $student->id }}">{{ $remark->teacher_comment ?? '' }}</textarea>
+                            </td>
+
+                            <td>
+                                <textarea name="remarks[{{ $student->id }}][principal_comment]" 
+                                    class="form-control auto-comment-principal" rows="2"
+                                    data-student="{{ $student->id }}">{{ $remark->principal_comment ?? '' }}</textarea>
+                            </td>
+                        </tr>
+                     @endforeach
+
                     </tbody>
 
                 </table>

@@ -6,7 +6,6 @@
   <title>Report Sheet</title>
   <link rel="stylesheet" href="{{ url('public/css/style.css') }}">
   <style>
-    /* Minimal inline fallbacks — keep your main styles in style.css */
     body { font-family: Arial, sans-serif; color:#111; }
     .report-header { width:100%; display:flex; gap:12px; align-items:center; }
     .logo-container { flex: 0 0 150px; text-align:center; }
@@ -28,62 +27,25 @@
 <body>
 
   <section>
-<div dir="rtl" style="text-align:center; font-weight:900; font-size:32px; margin-bottom:10px; color:#000; text-shadow:1px 1px 2px #555;">
-  مدرسة النور المثالية الإسلامية
-</div>
-    <h1>{{ $getSetting->school_name }}</h1>
+    <div dir="rtl" style="text-align:center; font-weight:900; font-size:32px; margin-bottom:10px; color:#000; text-shadow:1px 1px 2px #555;">
+      مدرسة النور المثالية الإسلامية
+    </div>
+    <h1>{{ $getSetting->school_name ?? 'SCHOOL NAME' }}</h1>
     <p>N0. 7 Brighter Road, Western Bye-pass, Minna, Niger State</p>
     <p>Phone: 07038042711, 09019190684, Email: annureduservices@gmail.com</p>
   </section>
 
-  {{-- HEADER ROW --}}
+  {{-- SAFETY: ensure variables exist --}}
   @php
-    // initialize overall counters
-    $subjectStats = [];
+    // Overall accumulators
     $overallTotal = 0;
-    $overallCount = 0;
-    $total_score = 0;
-    $full_marks = 0;
-  @endphp
+    $full_marks_total = 0;
+    $subjectCount = is_array($getExamMarks) ? count($getExamMarks) : 0;
 
-  {{-- Build subject stats and overall sums safely --}}
-  @foreach($getExamMarks as $exam)
-    @php
-      // ensure keys exist and are numeric where expected
-      $subject = $exam['subject_name'] ?? 'Unknown Subject';
-      $score = isset($exam['total_score']) ? (float)$exam['total_score'] : 0;
-      $fm = isset($exam['full_marks']) ? (float)$exam['full_marks'] : null; // may be null
-      // accumulate per-subject
-      if (!isset($subjectStats[$subject])) {
-          $subjectStats[$subject] = ['scores'=>[], 'total'=>0, 'count'=>0];
-      }
-      $subjectStats[$subject]['scores'][] = $score;
-      $subjectStats[$subject]['total'] += $score;
-      $subjectStats[$subject]['count']++;
-      // overall sums
-      $overallTotal += $score;
-      $overallCount++;
-      $total_score += $score;
-      if ($fm !== null) {
-          $full_marks += $fm;
-      } else {
-          // if full_marks not supplied, assume 100 per subject row
-          $full_marks += 100;
-      }
-    @endphp
-  @endforeach
-
-  {{-- finalize per-subject stats --}}
-  @php
-    foreach ($subjectStats as $k => $s) {
-      $subjectStats[$k]['average'] = round($s['count'] > 0 ? ($s['total'] / $s['count']) : 0, 2);
-      $subjectStats[$k]['lowest'] = count($s['scores']) ? min($s['scores']) : 0;
-      $subjectStats[$k]['highest'] = count($s['scores']) ? max($s['scores']) : 0;
-    }
-
-    // safe letter-grade helper (prevent redeclare)
+    // helper for grade (avoid redeclare)
     if (!function_exists('getLetterGrade')) {
         function getLetterGrade($score) {
+            $score = floatval($score);
             if ($score >= 70) return 'A';
             if ($score >= 60) return 'B';
             if ($score >= 50) return 'C';
@@ -93,10 +55,10 @@
         }
     }
 
-    // compute overall average and percentage safely
-    $overallAverage = $overallCount > 0 ? round($overallTotal / $overallCount, 2) : 0;
-    $Percentage = $full_marks > 0 ? ($total_score * 100) / $full_marks : 0;
-  @endphp
+    // resolve class id safely
+    $classId = $getClass->id ?? $getClass->class_id ?? $getStudent->class_id ?? request()->get('class_id') ?? null;
+    $studentId = $getStudent->id ?? null;
+@endphp
 
   <div class="report-header">
     <div class="logo-container">
@@ -105,38 +67,38 @@
 
     <div class="term-info">
       END OF THE TERM REPORT<br>
-      <small style="font-weight:normal;">Next term begins: 2024-01-08 &nbsp; / &nbsp; Term End: 2024-07-28</small>
+      <small style="font-weight:normal;">Next term begins: {{ $getSetting->next_term_begin }} &nbsp; / &nbsp; Term End: {{ $getSetting->term_end }}</small>
     </div>
 
     <div class="student-info">
-      <div><strong>Admission No:</strong> {{ $getStudent->admission_number }}</div>
-      <div><strong>Name:</strong> <span style="font-size:18px;">{{ $getStudent->name }} {{ $getStudent->last_name }}</span></div>
-      <div><strong>Gender:</strong> {{ $getStudent->gender }}</div>
-      <div><strong>Class:</strong> {{ $getClass->class_name }}</div>
+      <div><strong>Admission No:</strong> {{ $getStudent->admission_number ?? '-' }}</div>
+      <div><strong>Name:</strong> <span style="font-size:18px;">{{ ($getStudent->name ?? '') . ' ' . ($getStudent->last_name ?? '') }}</span></div>
+      <div><strong>Gender:</strong> {{ $getStudent->gender ?? '-' }}</div>
+      <div><strong>Class:</strong> {{ $getClass->class_name ?? '-' }}</div>
     </div>
 
     <div class="passport-container">
-      <img src="{{ $getStudent->getProfileDirect() }}" alt="Passport" style="width:150px; height:150px; border-radius:6px; object-fit:cover;">
+      <img src="{{ $getStudent->getProfileDirect() ?? url('public/images/default-avatar.png') }}" alt="Passport" style="width:150px; height:150px; border-radius:6px; object-fit:cover;">
     </div>
   </div>
 
   {{-- SESSION & ATTENDANCE --}}
-@php
-    // These methods should be defined in your Student model (or relevant model)
-    $daysPresent = $getStudent->getDaysPresent($getStudent->id, $getSetting->session_id ?? null);
-    $daysAbsent  = $getStudent->getDaysAbsent($getStudent->id, $getSetting->session_id ?? null);
-@endphp
+  @php
+    // safe attendance calls (some projects implement these helpers differently)
+    $daysPresent = method_exists($getStudent, 'getDaysPresent') ? $getStudent->getDaysPresent($studentId, $getSetting->session_id ?? null) : '-';
+    $daysAbsent  = method_exists($getStudent, 'getDaysAbsent') ? $getStudent->getDaysAbsent($studentId, $getSetting->session_id ?? null) : '-';
+  @endphp
 
-<table class="small-table">
-    <tr>
-        <td>Session: {{ $getExam->session->name ?? 'N/A' }}</td>
-        <td>Term: {{ $getExam->term->name ?? 'N/A' }}</td>
-        <td>Report Date: {{ \Carbon\Carbon::now()->format('jS F Y') }}</td>
-        <td>No. of Days Present: {{ $getStudent->getDaysPresent() }}</td>
-        <td>No. of Days Absent: {{ $getStudent->getDaysAbsent() }}</td>
-        <td>No. in Year Group: {{ $getClass->class_size ?? '-' }}</td>
-    </tr>
-</table>
+  <table class="small-table">
+      <tr>
+          <td>Session: {{ $getExam->session->name ?? 'N/A' }}</td>
+          <td>Term: {{ $getExam->term->name ?? 'N/A' }}</td>
+          <td>Report Date: {{ \Carbon\Carbon::now()->format('jS F Y') }}</td>
+          <td>No. of Days Present: {{ $daysPresent }}</td>
+          <td>No. of Days Absent: {{ $daysAbsent }}</td>
+          <td>No. in Year Group: {{ $getClass->class_size ?? '-' }}</td>
+      </tr>
+  </table>
 
   {{-- SUBJECTS TABLE --}}
   <table id="reportTable">
@@ -149,40 +111,61 @@
         <th>EXAM</th>
         <th>TOTAL MARKS</th>
         <th>GRADE</th>
-        <th>POSITION IN SUBJECTS</th>
+        <th>POSITION IN SUBJECT</th>
         <th>CLASS AVERAGE</th>
         <th>LOWEST IN CLASS</th>
         <th>HIGHEST IN CLASS</th>
       </tr>
     </thead>
     <tbody>
-@foreach($getExamMarks as $exam)
+@forelse($getExamMarks as $exam)
     @php
-        $subject = $exam['subject_name'];
-        $ca1 = $exam['ca1'];
-        $ca2 = $exam['ca2'];
-        $ca3 = $exam['ca3'];
-        $examScore = $exam['exam'];
-        $total = $exam['total_score'];
-        $stats = $subjectStats[$subject] ?? ['average'=>0,'lowest'=>0,'highest'=>0];
-        $grade = getLetterGrade((float)$total);
+        $subjectId = $exam['subject_id'] ?? null;
+        $examId = $exam['exam_id'] ?? $getExam->id ?? null;
 
-        // ✅ Fix: Ensure IDs are consistent
-        $examId = Request::get('exam_id') ?? ($exam['exam_id'] ?? null);
-        $classId = Request::get('class_id') ?? ($getClass->id ?? null);
-        $subjectId = $exam['subject_id'];
-        $studentId = $getStudent->id;
+        $ca1 = isset($exam['ca1']) ? floatval($exam['ca1']) : 0;
+        $ca2 = isset($exam['ca2']) ? floatval($exam['ca2']) : 0;
+        $ca3 = isset($exam['ca3']) ? floatval($exam['ca3']) : 0;
+        $examScore = isset($exam['exam']) ? floatval($exam['exam']) : 0;
 
-        $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
-            $examId,
-            $classId,
-            $subjectId,
-            $studentId
-        );
+        // ✅ no total_score column — calculate manually
+        $total = $ca1 + $ca2 + $ca3 + $examScore;
+        $fullMarks = isset($exam['full_marks']) ? floatval($exam['full_marks']) : 100;
+
+        $overallTotal += $total;
+        $full_marks_total += $fullMarks;
+
+        // ---- Class Scores for Average/Min/Max ----
+        $scores = [];
+        if ($examId && $classId && $subjectId) {
+            $marks = \App\Models\MarksRegisterModel::where('exam_id', $examId)
+                ->where('class_id', $classId)
+                ->where('subject_id', $subjectId)
+                ->get(['ca1','ca2','ca3','exam']);
+
+            foreach ($marks as $m) {
+                $scores[] = floatval($m->ca1 ?? 0) + floatval($m->ca2 ?? 0) +
+                            floatval($m->ca3 ?? 0) + floatval($m->exam ?? 0);
+            }
+        }
+
+        $classAverage = !empty($scores) ? round(array_sum($scores) / count($scores), 2) : '-';
+        $classLowest = !empty($scores) ? min($scores) : '-';
+        $classHighest = !empty($scores) ? max($scores) : '-';
+
+       // ---- Subject Position (consistent with Mark Register) ----
+  $subjectPosition = App\Models\MarksRegisterModel::getSubjectPosition(
+    $examId,     // make sure you pass same exam_id
+    $classId,    // same class_id
+    $subjectId,  // current subject
+    $studentId   // current student
+);
+
+        $grade = getLetterGrade($total);
     @endphp
 
     <tr>
-      <td>{{ $subject }}</td>
+      <td>{{ $exam['subject_name'] ?? 'Unknown Subject' }}</td>
       <td>{{ $ca1 }}</td>
       <td>{{ $ca2 }}</td>
       <td>{{ $ca3 }}</td>
@@ -190,41 +173,54 @@
       <td>{{ $total }}</td>
       <td>{{ $grade }}</td>
       <td>{{ $subjectPosition }}</td>
-      <td>{{ $stats['average'] }}</td>
-      <td>{{ $stats['lowest'] }}</td>
-      <td>{{ $stats['highest'] }}</td>
+      <td>{{ $classAverage }}</td>
+      <td>{{ $classLowest }}</td>
+      <td>{{ $classHighest }}</td>
     </tr>
-@endforeach
+@empty
+    <tr><td colspan="11" style="text-align:center;">No marks found</td></tr>
+@endforelse
 
-</tbody>
+  </tbody>
+  </table>
 
-</table>
+  {{-- SUMMARY & COMMENTS --}}
+  @php
+    // compute overall averages safely
+    $subjectCount = max(1, $subjectCount); // avoid division by zero (if no subjects we will show 0 below)
+    $overallAverage = isset($overallTotal) && $subjectCount > 0 ? round($overallTotal / $subjectCount, 2) : 0;
+    $Percentage = ($full_marks_total > 0) ? round(($overallTotal * 100) / $full_marks_total, 2) : 0;
 
-{{-- COMMENTS, STATS & RATINGS --}}
-@php
-    $remark = \App\Models\StudentReportRemark::where('student_id', $getStudent->id)
-        ->where('class_id', $getClass->id)
-        ->where('term_id', $getExam->term_id ?? null)
-        ->where('session_id', $getExam->session_id ?? null)
-        ->first();
+    // Prefer controller-provided variables; fall back to DB lookup only if missing
+    $skills = $skills ?? null;
+    $behaviours = $behaviour ?? ($behaviours ?? null); // accept either name
+    $teachers_comment = $teachers_comment ?? $teachersComment ?? null;
+    $principal_comment = $principal_comment ?? $principalComment ?? null;
 
-    // Decode skills and behaviour JSON if exists
-    $skills = !empty($remark->skills) ? json_decode($remark->skills, true) : [];
-    $behaviours = !empty($remark->behaviour) ? json_decode($remark->behaviour, true) : [];
+    if (($skills === null || $behaviours === null || $teachers_comment === null || $principal_comment === null) && isset($getStudent)) {
+        // fallback lookup (safe, only if needed)
+        $remark = \App\Models\StudentReportRemark::where('student_id', $getStudent->id)
+            ->where('class_id', $classId)
+            ->where('term_id', $getExam->term_id ?? null)
+            ->where('session_id', $getExam->session_id ?? null)
+            ->first();
 
-    // Auto-generate comments if not provided
-    $teacherComment = $remark->teacher_comment ?? (
-        $Percentage >= 70 ? 'Excellent performance — keep it up.' :
-        ($Percentage >= 50 ? 'Good performance — needs improvement in some areas.' :
-        'Work harder to improve next term.')
-    );
+        if ($skills === null) {
+            $skills = !empty($remark->skills) ? (is_array($remark->skills) ? $remark->skills : json_decode($remark->skills, true)) : [];
+        }
+        if ($behaviours === null) {
+            $behaviours = !empty($remark->behaviour) ? (is_array($remark->behaviour) ? $remark->behaviour : json_decode($remark->behaviour, true)) : [];
+        }
+        $teachers_comment = $teachers_comment ?? $remark->teachers_comment ?? $remark->teacher_comment ?? null;
+        $principal_comment = $principal_comment ?? $remark->principal_comment ?? null;
+    }
 
-    $principalComment = $remark->principal_comment ?? (
-        $Percentage >= 70 ? 'Highly commendable result.' :
-        ($Percentage >= 50 ? 'Satisfactory result, but more effort is required.' :
-        'Below expectations — encourage greater focus.')
-    );
-@endphp
+    // final safe defaults
+    $skills = is_array($skills) ? $skills : (!empty($skills) ? (is_string($skills) ? json_decode($skills, true) : []) : []);
+    $behaviours = is_array($behaviours) ? $behaviours : (!empty($behaviours) ? (is_string($behaviours) ? json_decode($behaviours, true) : []) : []);
+    $teacherComment = $teachers_comment ?? ($Percentage >= 70 ? 'Excellent performance — keep it up.' : ($Percentage >= 50 ? 'Good performance — needs improvement in some areas.' : 'Work harder to improve next term.'));
+    $principalComment = $principal_comment ?? ($Percentage >= 70 ? 'Highly commendable result.' : ($Percentage >= 50 ? 'Satisfactory result, but more effort is required.' : 'Below expectations — encourage greater focus.'));
+  @endphp
 
  <div class="three-col">
     <table>
@@ -240,17 +236,31 @@
     <table>
     <tr><th colspan="2">Skills and Behaviour</th></tr>
     <tr><td><strong>Skill/Behaviour</strong></td><td><strong>Rating</strong></td></tr>
-    @if(!empty($skills) || !empty($behaviours))
-        @foreach(array_merge($skills, $behaviours) as $item)
+
+    {{-- Skills --}}
+    @if(!empty($skills))
+        @foreach($skills as $skill => $rating)
             <tr>
-                <td>{{ $item['name'] ?? '-' }}</td>
-                <td>{{ $item['rating'] ?? '-' }}</td>
+                <td>{{ ucfirst(str_replace('_',' ', $skill)) }}</td>
+                <td>{{ $rating }}</td>
             </tr>
         @endforeach
-    @else
-        <tr><td colspan="2">No ratings available</td></tr>
+    @endif
+
+      {{-- Behaviour --}}
+    @if(!empty($behaviour) || !empty($behaviours))
+        @foreach(($behaviours ?? $behaviour ?? []) as $trait => $rating)
+            <tr>
+                <td>{{ ucfirst(str_replace('_',' ', $trait)) }}</td>
+                <td>{{ $rating }}</td>
+            </tr>
+        @endforeach
+    @endif
+    @if(empty($skills) && empty($behaviour))
+      <tr><td colspan="2">No ratings available</td></tr>
     @endif
 </table>
+
 
     <table>
         <tr><th>Keys to Ratings</th></tr>
@@ -275,39 +285,48 @@
       <div style="height:48px;"></div>
       <div>Principal's Signature</div>
     </div>
- @if(!empty($getStudent))
-    @php
-         $getFees = \App\Models\StudentAddFeesModel::getTotalAmount($getStudent->id);
-         $totalAmount = $getFees->total_amount ?? 0;
-         $paid_amount = $getStudent->getPaidAmount($getStudent->id, $getStudent->class_id);
-         $RemainingAmount = $totalAmount - $paid_amount;
-        $status = $RemainingAmount > 0 ? 'Pending' : 'Paid';
-    @endphp
 
-    <table border="1" cellpadding="8" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>Total Amount</th>
-                <th>Paid Amount</th>
-                <th>Balance</th>
-                <th>Payment Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>₦{{ number_format($totalAmount ?? 0, 2) }}</td>
-                <td>₦{{ number_format($paid_amount, 2) }}</td>
-                <td>₦{{ number_format($RemainingAmount, 2) }}</td>
-                <td>{{ $status }}</td>
-            </tr>
-        </tbody>
-    </table>
-@else
-    <p>No payment record found for this student.</p>
-@endif
+    @if(!empty($getStudent))
+        @php
+            $getFees = \App\Models\StudentAddFeesModel::getTotalAmount($getStudent->id);
+            $totalAmount = $getFees->total_amount ?? 0;
+            $paid_amount = method_exists($getStudent, 'getPaidAmount') 
+                ? $getStudent->getPaidAmount($getStudent->id, $classId) 
+                : 0;
+            $RemainingAmount = $totalAmount - $paid_amount;
+
+            // Blade-safe nested ternary
+            $status = $totalAmount == 0 
+                ? 'No payment record found for this student' 
+                : ($RemainingAmount > 0 ? 'Pending' : 'Paid');
+        @endphp
+
+
+        <table border="1" cellpadding="8" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Total Amount</th>
+                    <th>Paid Amount</th>
+                    <th>Balance</th>
+                    <th>Payment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>₦{{ number_format($totalAmount ?? 0, 2) }}</td>
+                    <td>₦{{ number_format($paid_amount, 2) }}</td>
+                    <td>₦{{ number_format($RemainingAmount, 2) }}</td>
+                    <td>{{ $status }}</td>
+                </tr>
+            </tbody>
+        </table>
+    @else
+        <p>No payment record found for this student.</p>
+    @endif
   </div>
-   <script type="text/javascript">
-      // window.print();
-    </script>
+
+  <script type="text/javascript">
+     window.print();
+  </script>
 </body>
 </html>

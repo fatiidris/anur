@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+         $helpers = app_path('Helpers/helpers.php');
+        if (file_exists($helpers)) {
+            require_once $helpers;
+        }
         paginator::useBootstrap();
     }
 }

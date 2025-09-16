@@ -42,7 +42,7 @@ class TermController extends Controller
             'is_delete'  => 0,
         ]);
 
-        return redirect()->route('term.list')->with('success', 'Term added successfully!');
+        return redirect()->route('admin.term.list')->with('success', 'Term added successfully!');
     }
 
     // Show edit form
@@ -68,7 +68,7 @@ class TermController extends Controller
             'name'       => $request->name,
         ]);
 
-        return redirect()->route('admin/examinations/term/list')->with('success', 'Term updated successfully!');
+        return redirect()->route('admin.term.list')->with('success', 'Term updated successfully!');
     }
 
     // Soft delete term

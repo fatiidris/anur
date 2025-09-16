@@ -190,7 +190,7 @@
 
                                   <td style="min-width: 250px;">
                                       <button type="submit" class="btn btn-success">Save</button>
-                                      <a class="btn btn-primary" target="_blanck" href="{{ url('teacher/my_exam_result/print?exam_id='.Request::get('exam_id').'&student_id='.$student->id) }}">Print</a>
+                                      <!-- <a class="btn btn-primary" target="_blanck" href="{{ url('teacher/my_exam_result/print?exam_id='.Request::get('exam_id').'&student_id='.$student->id) }}">Print</a> -->
                                        @if(!empty($totalStudentMark))
                                           <br>
                                           <b>Total Subject Mark : </b>{{ $totalFullMarks }}

@@ -436,96 +436,264 @@ public function exam_edit($id)
             $data['header_title'] = "My Exam Timetable";
             return view('student.my_exam_timetable', $data);
         }
-     public function MyExamResult()
-    {
-        $studentId = Auth::user()->id;
-        $result = [];
 
-        // Get all exams for this student
-        $getExam = MarksRegisterModel::getExam($studentId);
+public function MyExamResult()
+{
+    $studentId = Auth::user()->id;
+    $result = [];
 
-        foreach ($getExam as $value) {
-            $dataE = [];
-            $dataE['exam_name'] = $value->exam_name;
-            $dataE['exam_id'] = $value->exam_id;
+    // Get all exams for this student
+    $getExams = MarksRegisterModel::getExam($studentId);
 
-            // Get all subjects for this exam & student
-            $getExamSubject = MarksRegisterModel::getExamSubject($value->exam_id, $studentId);
-            $dataSubject = [];
+    foreach ($getExams as $exam) {
+        $dataE = [];
+        $dataE['exam_name'] = $exam->exam_name;
+        $dataE['exam_id']   = $exam->exam_id;
 
-            // Calculate total score for this student (all subjects)
-            $studentTotal = 0;
+        // Get all subjects for this exam & student
+        $getExamSubjects = MarksRegisterModel::getExamSubject($exam->exam_id, $studentId);
+        $dataSubjects = [];
+        $studentTotal = 0;
+        $result_validation = 0;
 
-            foreach ($getExamSubject as $exam) {
-                $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
-                $studentTotal += $total_score;
+        foreach ($getExamSubjects as $subj) {
+            $total_score = $subj['ca1'] + $subj['ca2'] + $subj['ca3'] + $subj['exam'];
 
-                $dataS = [];
-                $dataS['subject_name'] = $exam['subject_name'];
-                $dataS['ca1'] = $exam['ca1'];
-                $dataS['ca2'] = $exam['ca2'];
-                $dataS['ca3'] = $exam['ca3'];
-                $dataS['exam'] = $exam['exam'];
-                $dataS['total_score'] = $total_score;
-                $dataS['full_marks'] = $exam['full_marks'];
-                $dataS['passing_mark'] = $exam['passing_mark'];
-                $dataSubject[] = $dataS;
+            // Pass if total_score >= 40% of passing mark
+            if ($subj['passing_mark'] > 0 && $total_score < 0.4 * $subj['passing_mark']) {
+                $result_validation = 1; // fail flag
             }
 
-            // ===== NEW: Calculate position for this exam =====
-            $ranking = MarksRegisterModel::select('student_id', DB::raw('SUM(ca1 + ca2 + ca3 + exam) as total'))
-                ->where('exam_id', $value->exam_id)
-                ->groupBy('student_id')
-                ->orderByDesc('total')
-                ->pluck('student_id')
-                ->toArray();
+            $dataSubjects[] = [
+                'subject_id'   => $subj['subject_id'],
+                'exam_id'      => $subj['exam_id'],
+                'subject_name' => $subj['subject_name'],
+                'ca1'          => $subj['ca1'],
+                'ca2'          => $subj['ca2'],
+                'ca3'          => $subj['ca3'],
+                'exam'         => $subj['exam'],
+                'total_score'  => $total_score,
+                'full_marks'   => $subj['full_marks'],
+                'passing_mark' => $subj['passing_mark'],
+            ];
 
-            $position = array_search($studentId, $ranking);
-            $dataE['position'] = $position !== false ? $position + 1 : '-';
-            // ================================================
-
-            $dataE['subject'] = $dataSubject;
-            $dataE['student_total'] = $studentTotal; // Optional: Total marks for this student
-            $result[] = $dataE;
+            $studentTotal += $total_score;
         }
 
-        $data['getRecord'] = $result;
-        $data['header_title'] = "My Exam Result";
+        $dataE['subject'] = $dataSubjects;
+        $dataE['student_total'] = $studentTotal;
+        $dataE['result_validation'] = $result_validation;
 
-        return view('student.my_exam_result', $data);
+        // Fetch remark for this exam/student
+        $remark = StudentReportRemark::where('student_id', $studentId)
+            ->where('class_id', Auth::user()->class_id)
+            ->where('term_id', $exam->term_id)
+            ->where('session_id', $exam->session_id)
+            ->first();
+
+        $skills = [];
+        $behaviours = [];
+        $teachers_comment = '';
+        $principal_comment = '';
+
+        if ($remark) {
+            $skills = !empty($remark->skills) ? (is_array($remark->skills) ? $remark->skills : json_decode($remark->skills, true)) : [];
+            $behaviours = !empty($remark->behaviour) ? (is_array($remark->behaviour) ? $remark->behaviour : json_decode($remark->behaviour, true)) : [];
+            $teachers_comment = $remark->teachers_comment ?? '';
+            $principal_comment = $remark->principal_comment ?? '';
+        }
+
+        // Auto comment if missing
+        if (empty($teachers_comment)) {
+            $average = count($dataSubjects) ? $studentTotal / count($dataSubjects) : 0;
+
+            if ($average >= 70) {
+                $teachers_comment = "Excellent performance. Keep it up!";
+                $principal_comment = "Outstanding! Proud of your achievement.";
+            } elseif ($average >= 60) {
+                $teachers_comment = "Good effort. Aim for even higher.";
+                $principal_comment = "A commendable performance.";
+            } elseif ($average >= 50) {
+                $teachers_comment = "Fair. More dedication is needed.";
+                $principal_comment = "Encourage to work harder for improvement.";
+            } else {
+                $teachers_comment = "Weak performance. Needs serious attention.";
+                $principal_comment = "Student must improve significantly.";
+            }
+        }
+
+        $dataE['skills'] = $skills;
+        $dataE['behaviours'] = $behaviours;
+        $dataE['teachers_comment'] = $teachers_comment;
+        $dataE['principal_comment'] = $principal_comment;
+
+        $result[] = $dataE;
     }
 
-        public function MyExamResultPrint(Request $request)
-        {
-            $exam_id = $request->exam_id;
-            $student_id = $request->student_id;
-            $data['getExam'] = ExamModel::getSingle($exam_id);
-            $data['getStudent'] = User::getSingle($student_id);
+    $data['getRecord'] = $result;
+    $data['header_title'] = "My Exam Result";
 
-            $data['getClass'] = MarksRegisterModel::getClass($exam_id, $student_id);
-            $data['getSetting'] = SettingModel::getSingle();
-            
-            $getExamSubject = MarksRegisterModel::getExamSubject($exam_id, $student_id);
+    return view('student.my_exam_result', $data);
+}
 
-                $dataSubject = array();
-                foreach($getExamSubject as $exam)
-                {
-                    $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam']; 
-                    $dataS = array();
-                    $dataS['subject_id'] = $exam['subject_id'];
-                    $dataS['subject_name'] = $exam['subject_name'];
-                    $dataS['ca1'] = $exam['ca1'];
-                    $dataS['ca2'] =  $exam['ca2'];
-                    $dataS['ca3'] =  $exam['ca3'];
-                    $dataS['exam']      =  $exam['exam'];
-                    $dataS['total_score']      =  $total_score;
-                    $dataS['full_marks'] = $exam['full_marks'];
-                    $dataS['passing_mark'] = $exam['passing_mark'];
-                    $dataSubject[] = $dataS;
-                }
-                $data['getExamMarks'] = $dataSubject;
-            return view('exam_result_print', $data);
+/**
+ * Convert number to ordinal (1st, 2nd, 3rd...)
+ */
+public function MyExamResultPrint(Request $request)
+{
+    $user = Auth::user();
+    $students = User::where('parent_id', Auth::id())->get();
+
+
+    // ✅ Auto-detect role & assign student_id
+    // if ($user->user_type == 'student') {
+    //     $student_id = $user->id;
+    // } elseif ($user->user_type == 'parent') {
+    //     $student_id = User::where('parent_id', $user->id)->value('id');
+    //     if (!$student_id) {
+    //         return redirect()->back()->with('error', 'No student linked to this parent.');
+    //     }
+    // } else {
+    //     // Admin must pass student_id
+    //     $student_id = $request->student_id;
+    //     if (!$student_id) {
+    //         return redirect()->back()->with('error', 'Student ID is required.');
+    //     }
+    // }
+
+    $exam_id = $request->exam_id;
+
+    // === Exam & Student Info ===
+    $data['getExam']    = ExamModel::getSingle($exam_id);
+    $data['getStudent'] = User::getSingle($student_id);
+    $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
+    $data['getSetting'] = SettingModel::getSingle();
+
+    // === Exam Marks ===
+    $getExamSubject = MarksRegisterModel::getExamSubject($exam_id, $student_id);
+    $dataSubject = [];
+
+    foreach ($getExamSubject as $exam) {
+        $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
+
+        $dataSubject[] = [
+            'subject_id'   => $exam['subject_id'],
+            'exam_id'      => $exam['exam_id'],
+            'subject_name' => $exam['subject_name'],
+            'ca1'          => $exam['ca1'],
+            'ca2'          => $exam['ca2'],
+            'ca3'          => $exam['ca3'],
+            'exam'         => $exam['exam'],
+            'total_score'  => $total_score,
+            'full_marks'   => $exam['full_marks'],
+            'passing_mark' => $exam['passing_mark'],
+        ];
+    }
+    $data['getExamMarks'] = $dataSubject;
+
+    // === Calculate Overall Average ===
+    $average = count($dataSubject) > 0 
+        ? round(array_sum(array_column($dataSubject, 'total_score')) / count($dataSubject), 2)
+        : 0;
+    $data['average'] = $average;
+
+    // === Calculate Ranking (Position in Class) ===
+    $ranking = MarksRegisterModel::select('student_id', DB::raw('SUM(ca1 + ca2 + ca3 + exam) as total'))
+        ->where('exam_id', $exam_id)
+        ->groupBy('student_id')
+        ->orderByDesc('total')
+        ->pluck('student_id')
+        ->toArray();
+
+    $position = array_search($student_id, $ranking);
+    if ($position !== false) {
+        $pos = $position + 1; // 0-based index
+        $data['position'] = $this->ordinal($pos);
+    } else {
+        $data['position'] = '-';
+    }
+
+    $exam_id = $request->exam_id;
+if (!$exam_id) {
+    return back()->with('error', 'Exam ID is missing.');
+}
+
+$data['getExam'] = ExamModel::getSingle($exam_id);
+if (!$data['getExam']) {
+    return back()->with('error', 'Exam not found.');
+}
+
+   // === Fetch Remarks (Backward Compatible) ===
+$remark = StudentReportRemark::where('student_id', $student_id)
+    ->where('exam_id', $exam_id)   // ✅ new column for fresh records
+    ->where('class_id', $data['getStudent']->class_id)
+    ->where('term_id', $data['getExam']->term_id)
+    ->where('session_id', $data['getExam']->session_id)
+    ->first();
+
+if (!$remark) {
+    // 🔙 fallback for old records that were saved before exam_id was added
+    $remark = StudentReportRemark::where('student_id', $student_id)
+        ->where('class_id', $data['getStudent']->class_id)
+        ->where('term_id', $data['getExam']->term_id)
+        ->where('session_id', $data['getExam']->session_id)
+        ->first();
+}
+
+$skills = [];
+$behaviours = [];
+$teachers_comment = '';
+$principal_comment = '';
+
+if ($remark) {
+    $skills = !empty($remark->skills) ? $remark->skills : [];
+    $behaviours = !empty($remark->behaviour) ? $remark->behaviour : [];
+    $teachers_comment = $remark->teachers_comment ?? '';
+    $principal_comment = $remark->principal_comment ?? '';
+
+    // ✅ Auto-generate comments if missing
+    if (empty($teachers_comment)) {
+        if ($average >= 70) {
+            $teachers_comment = "Excellent performance. Keep it up!";
+            $principal_comment = "Outstanding! Proud of your achievement.";
+        } elseif ($average >= 60) {
+            $teachers_comment = "Good effort. Aim for even higher.";
+            $principal_comment = "A commendable performance.";
+        } elseif ($average >= 50) {
+            $teachers_comment = "Fair. More dedication is needed.";
+            $principal_comment = "Encourage to work harder for improvement.";
+        } else {
+            $teachers_comment = "Weak performance. Needs serious attention.";
+            $principal_comment = "Student must improve significantly.";
         }
+    }
+}
+
+    $data['skills'] = $skills;
+    $data['behaviours'] = $behaviours;
+    $data['teachers_comment'] = $teachers_comment;
+    $data['principal_comment'] = $principal_comment;
+
+    // dd($remark);
+
+    return view('exam_result_print', $data);
+}
+
+// === Ordinal Helper ===
+private function ordinal($number)
+{
+    if (!is_numeric($number)) {
+        return $number;
+    }
+
+    $ends = ['th','st','nd','rd','th','th','th','th','th','th'];
+    if ((($number % 100) >= 11) && (($number % 100) <= 13)) {
+        return $number. 'th';
+    } else {
+        return $number. $ends[$number % 10];
+    }
+}
+
 
     //Teacher side work
     public function MyExamTimetableTeacher()
@@ -621,34 +789,38 @@ public function saveReportRemark(Request $request)
     ]);
 
     foreach ($request->remarks as $studentId => $remarkData) {
-        // Ensure required fields exist
         if (!isset($remarkData['class_id'], $remarkData['term_id'], $remarkData['session_id'])) {
-            continue; // Skip if essential IDs are missing
+            continue; // skip incomplete rows
         }
 
+        // Prepare data (names must match your model + DB columns)
+        $saveData = [
+            'skills'            => $remarkData['skills'] ?? null,        // array (auto-cast to JSON)
+            'behaviour'         => $remarkData['behaviour'] ?? null,     // array (auto-cast to JSON)
+            'teachers_comment'   => $remarkData['teachers_comment'] ?? null,
+            'principal_comment' => $remarkData['principal_comment'] ?? null,
+        ];
+
+        // Save or update
         \App\Models\StudentReportRemark::updateOrCreate(
             [
-                'student_id' => $studentId, // we already know the student_id from array key
-                'class_id' => $remarkData['class_id'],
-                'term_id' => $remarkData['term_id'],
+                'student_id' => $studentId,
+                'class_id'   => $remarkData['class_id'],
+                'term_id'    => $remarkData['term_id'],
                 'session_id' => $remarkData['session_id'],
             ],
-            [
-                // Save skills & behaviours as JSON (so multiple ratings fit in one column)
-                'skills' => isset($remarkData['skills']) ? json_encode($remarkData['skills']) : null,
-                'behaviours' => isset($remarkData['behaviours']) ? json_encode($remarkData['behaviours']) : null,
-
-                'teacher_comment' => $remarkData['teacher_comment'] ?? null,
-                'principal_comment' => $remarkData['principal_comment'] ?? null,
-            ]
+            $saveData
         );
     }
 
     return redirect('teacher/remarks_report')->with('success', "All student remarks saved successfully");
-}
-    //parent side
+}   
+
+//parent side
     public function ParentMyExamTimetable($student_id)
     {
+     $students = User::where('parent_id', Auth::id())->get();
+
     $getStudent = User::getSingle($student_id);
     $class_id = $getStudent->class_id;
     $getExam = ExamScheduleModel::getExam($class_id);
@@ -683,39 +855,68 @@ public function saveReportRemark(Request $request)
 
     }
 
-    public function ParentMyExamResult($student_id)
-    {
+public function ParentMyExamResult(Request $request, $student_id)
+{
+     $parentId = Auth::id();
 
+    // all the children for this parent
+    $students = User::where('parent_id', $parentId)->get();
+
+    // all the exams you want to display (or the current exam)
+    $exams = ExamModel::all();   // or your own filtering
+
+    return view('parent.my_exam_result_index', [
+        'students' => $students,
+        'exams'    => $exams,
+    ]);
+    // Read from query string
+    // $exam_id    = $request->query('exam_id');     // or $request->input('exam_id')
+    // $student_id = $request->query('student_id');  // overwrites the route param with the real one
+
+    // Guard against missing params
+    // if (!$exam_id || !$student_id) {
+    //     return back()->with('error', 'Missing exam_id or student_id.');
+    // }
+
+    $data['getExam']    = ExamModel::getSingle($exam_id);
     $data['getStudent'] = User::getSingle($student_id);
-    $result = array();
-    $getExam = MarksRegisterModel::getExam($student_id);
-    foreach($getExam as $value)
-    {
-        $dataE = array();
-        $dataE['exam_id'] = $value->exam_id;
-        $dataE['exam_name'] = $value->exam_name;
-        $getExamSubject = MarksRegisterModel::getExamSubject($value->exam_id, $student_id);
-        $dataSubject = array();
-        foreach($getExamSubject as $exam)
-        {
-            $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam']; 
-            $dataS = array();
-            $dataS['subject_name'] = $exam['subject_name'];
-            $dataS['ca1'] = $exam['ca1'];
-            $dataS['ca2'] =  $exam['ca2'];
-            $dataS['ca3'] =  $exam['ca3'];
-            $dataS['exam']      =  $exam['exam'];
-            $dataS['total_score']      =  $total_score;
-            $dataS['full_marks'] = $exam['full_marks'];
-            $dataS['passing_mark'] = $exam['passing_mark'];
-            $dataSubject[] = $dataS;
-        }
-        $dataE['subject'] = $dataSubject;
-        $result[] = $dataE;
-    }
-    $data['getRecord'] = $result;
-    $data['header_title'] = "My Exam Result";
-    return view('parent.my_exam_result', $data);
-    }
+    $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
+    $data['getSetting'] = SettingModel::getSingle();
 
+    // ===== Exam subjects and scores =====
+    $getExamSubject = MarksRegisterModel::getExamSubject($exam_id, $student_id);
+    $dataSubject = [];
+    foreach ($getExamSubject as $exam) {
+        $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
+        $dataSubject[] = [
+            'subject_id'   => $exam['subject_id'],
+            'exam_id'      => $exam['exam_id'],
+            'subject_name' => $exam['subject_name'],
+            'ca1'          => $exam['ca1'],
+            'ca2'          => $exam['ca2'],
+            'ca3'          => $exam['ca3'],
+            'exam'         => $exam['exam'],
+            'total_score'  => $total_score,
+            'full_marks'   => $exam['full_marks'],
+            'passing_mark' => $exam['passing_mark'],
+        ];
+    }
+    $data['getExamMarks'] = $dataSubject;
+
+    // ===== Remarks =====
+    $remark = StudentReportRemark::where('student_id', $student_id)
+        ->where('class_id', $data['getStudent']->class_id)
+        ->where('term_id',  $data['getExam']->term_id ?? 0)
+        ->where('session_id', $data['getExam']->session_id ?? 0)
+        ->first();
+
+    $data['skills']            = $remark?->skills ?? [];
+    $data['behaviour']         = $remark?->behaviour ?? [];
+    $data['teachers_comment']  = $remark?->teachers_comment ?? '';
+    $data['principal_comment'] = $remark?->principal_comment ?? '';
+
+    $data['header_title'] = "My Exam Result";
+
+    return view('parent.my_exam_result', $data);
+ }
 }

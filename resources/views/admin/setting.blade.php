@@ -30,7 +30,7 @@
                 <div class="card-body">
                   <div class="form-group">
                     <label>Paystack Business Email</label>
-                    <input type="email" class="form-control" name="paystack_secret" value= "{{ $getRecord->paypal_email }}" required placeholder="Paypal Business Email">
+                    <input type="email" class="form-control" name="paystack_email" value= "{{ $getRecord->paystack_email }}" required placeholder="Paystack Business Email">
                   </div>
 
                   <div class="form-group">
@@ -68,6 +68,14 @@
                   <div class="form-group">
                      <label>Exam Description</label>
                      <textarea name="exam_description" class="form-control">{{ $getRecord->exam_description }}</textarea>
+                  </div>
+                  <div class="form-group">
+                     <label>Next Term Begins</label>
+                     <input type="date" name="next_term_begin" class="form-control" value="{{ $getRecord->next_term_begin }}">
+                  </div>
+                  <div class="form-group">
+                     <label>Term End</label>
+                     <input type="date" name="term_end" class="form-control" value="{{ $getRecord->term_end }}">
                   </div>
 
                  <div class="card-footer">

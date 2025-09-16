@@ -15,12 +15,13 @@ class StudentReportRemark extends Model
     // Mass assignable fields
     protected $fillable = [
         'student_id',
+        'exam_id',
         'class_id',
         'term_id',
         'session_id',
         'skills',
         'behaviour',
-        'teacher_comment',
+        'teachers_comment',
         'principal_comment',
     ];
 

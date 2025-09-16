@@ -51,6 +51,9 @@ use App\Http\Controllers\FrontendController;
 //     return view('welcome');
 // });
 
+Route::get('/test-ordinal', function() {
+    return ordinal(22);
+});
 
 // Frontend routes
 Route::get('/', [FrontendController::class, 'home'])->name('home');

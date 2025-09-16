@@ -24,11 +24,13 @@ class UserController extends Controller
     public function UpdateSetting(Request $request)
     {
         $setting = SettingModel::getSingle();
-        $setting->paypal_email = trim($request->paypal_email);
+        $setting->paystack_email = trim($request->paystack_email);
         $setting->paystack_key = trim($request->paystack_key);
         $setting->paystack_secret = trim($request->paystack_secret);
         $setting->school_name = trim($request->school_name);
         $setting->exam_description = trim($request->exam_description);
+        $setting->next_term_begin = trim($request->next_term_begin);
+        $setting->term_end = trim($request->term_end);
 
         if(!empty($request->file('logo')))
        {
