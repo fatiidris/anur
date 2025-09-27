@@ -211,11 +211,36 @@
                                          <b>Grade :</b> {{ $getGrade }}
                                          <br>
                                          @endif
-                                          @if($pass_fail_vali == 0)
-                                            Result :  <span style="color: green;font-weight: bold ">Pass</span>
-                                          @else
-                                            Result : <span style="color: red; font-weight: bold">Fail</span>
-                                          @endif 
+                                         @php
+                                          // Determine grade based on percentage
+                                          $gradeLabel = '';
+                                          $gradeColor = 'black'; // default text color
+
+                                          if ($percentage >= 70) {
+                                              $gradeLabel = 'A - Distinction';
+                                              $gradeColor = 'green';
+                                          } elseif ($percentage >= 60) {
+                                              $gradeLabel = 'B - Very Good';
+                                              $gradeColor = 'blue';
+                                          } elseif ($percentage >= 50) {
+                                              $gradeLabel = 'C - Credit';
+                                              $gradeColor = '#006400'; // dark green
+                                          } elseif ($percentage >= 45) {
+                                              $gradeLabel = 'D - Pass';
+                                              $gradeColor = '#8B8000'; // golden brown
+                                          } elseif ($percentage >= 40) {
+                                              $gradeLabel = 'E - Fair';
+                                              $gradeColor = 'orange';
+                                          } else {
+                                              $gradeLabel = 'Fail';
+                                              $gradeColor = 'red';
+                                          }
+                                      @endphp
+
+                                      <b>Result :</b>
+                                      <span style="color: {{ $gradeColor }}; font-weight: bold;">
+                                          {{ $gradeLabel }}
+                                      </span> 
                                        @endif  
                                   </td>
                               </tr>

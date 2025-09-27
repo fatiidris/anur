@@ -12,6 +12,7 @@ use App\Models\ClassSubjectModel;
 use App\Models\ExamScheduleModel;
 use App\Models\MarksRegisterModel;
 use App\Models\AssignClassTeacherModel;
+use App\Models\AssignSubjectTeacherModel;
 use App\Models\MarksGradeModel;
 use App\Models\SessionModel;
 use App\Models\TermModel;
@@ -25,93 +26,107 @@ class ExaminationsController extends Controller
 {
     public function exam_list()
     {
-        $data['sessions'] = SessionModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
-        $data['terms'] = TermModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
-        $data['getRecord'] = ExamModel::getRecord();
+        $data['sessions']   = SessionModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+        $data['terms']      = TermModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+        $data['getRecord']  = ExamModel::getRecord();
         $data['header_title'] = "Exam List";
+
         return view('admin.examinations.exam.list', $data);
     }
+
     public function exam_add()
     {
         $data['header_title'] = "Add New Exam";
-        $data['sessions'] = SessionModel::where('is_delete', 0)->get();
-        $data['terms'] = TermModel::where('is_delete', 0)->get();
+        $data['sessions']     = SessionModel::where('is_delete', 0)->get();
+        $data['terms']        = TermModel::where('is_delete', 0)->get();
 
         return view('admin.examinations.exam.add', $data);
     }
+
     public function exam_insert(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'session_id' => 'required|exists:session,id', // FIXED
-            'term_id' => 'required|exists:term,id',       // FIXED
+            'name'               => 'required|string|max:255',
+            'session_id'         => 'required|exists:session,id',
+            'term_id'            => 'required|exists:term,id',
+            // ✅ New validations for the datetime window
+            'marks_entry_start'  => 'nullable|date',
+            'marks_entry_end'    => 'nullable|date|after_or_equal:marks_entry_start',
         ]);
 
-        $exam = new ExamModel();
-        $exam->name = trim($request->name);
-        $exam->session_id = $request->session_id;
-        $exam->term_id = $request->term_id;
-        $exam->created_by = Auth::id();
-        $exam->is_delete = $request->is_delete ?? 0;
+        $exam              = new ExamModel();
+        $exam->name        = trim($request->name);
+        $exam->session_id  = $request->session_id;
+        $exam->term_id     = $request->term_id;
+        $exam->created_by  = Auth::id();
+        $exam->is_delete   = $request->is_delete ?? 0;
+        // ✅ Save the new fields if provided
+        $exam->marks_entry_start = $request->marks_entry_start;
+        $exam->marks_entry_end   = $request->marks_entry_end;
         $exam->save();
 
         return redirect('admin/examinations/exam/list')
             ->with('success', "Exam Successfully Created");
     }
-public function exam_edit($id)
-{
-    // Get single exam with relationships (your getSingle() already does this)
-    $data['getRecord'] = ExamModel::getSingle($id);
 
-    if (!empty($data['getRecord'])) {
-        $data['header_title'] = "Edit Exam";
+    public function exam_edit($id)
+    {
+        $data['getRecord'] = ExamModel::getSingle($id);
 
-        // Fetch sessions and terms for dropdowns
-        $data['sessions'] = SessionModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
-        $data['terms'] = TermModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+        if (!empty($data['getRecord'])) {
+            $data['header_title'] = "Edit Exam";
+            $data['sessions']     = SessionModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
+            $data['terms']        = TermModel::where('is_delete', 0)->orderBy('name', 'asc')->get();
 
-        return view('admin.examinations.exam.edit', $data);
-    } else {
-        abort(404);
+            return view('admin.examinations.exam.edit', $data);
+        } else {
+            abort(404);
+        }
     }
-}
- 
- public function exam_update($id, Request $request)
-  {
-    $request->validate([
-        'name'       => 'required|string|max:255',
-        'session_id' => 'required|integer|exists:session,id',
-        'term_id'    => 'required|integer|exists:term,id',
-    
-    ]);
 
-    $exam = ExamModel::getSingle($id);
+    public function exam_update($id, Request $request)
+    {
+        $request->validate([
+            'name'               => 'required|string|max:255',
+            'session_id'         => 'required|integer|exists:session,id',
+            'term_id'            => 'required|integer|exists:term,id',
+            // ✅ New validations for the datetime window
+            'marks_entry_start'  => 'nullable|date',
+            'marks_entry_end'    => 'nullable|date|after_or_equal:marks_entry_start',
+        ]);
 
-    if ($exam) {
-        $exam->name       = trim($request->name);
-        $exam->session_id = $request->session_id; 
-        $exam->term_id    = $request->term_id;    
-        $exam->created_by = Auth::user()->id;
-        $exam->save();
+        $exam = ExamModel::getSingle($id);
 
-        return redirect('admin/examinations/exam/list')->with('success', "Exam Successfully Updated");
-    } else {
-        abort(404);
+        if ($exam) {
+            $exam->name        = trim($request->name);
+            $exam->session_id  = $request->session_id;
+            $exam->term_id     = $request->term_id;
+            $exam->created_by  = Auth::user()->id;
+            // ✅ Update the new fields
+            $exam->marks_entry_start = $request->marks_entry_start;
+            $exam->marks_entry_end   = $request->marks_entry_end;
+            $exam->save();
+
+            return redirect('admin/examinations/exam/list')->with('success', "Exam Successfully Updated");
+        } else {
+            abort(404);
+        }
     }
- }
- public function exam_delete($id)
-  {
-    $getRecord = ExamModel::getSingle($id);
 
-    if (!empty($getRecord)) {
-        $getRecord->is_delete = 1;
-        $getRecord->save();
+    public function exam_delete($id)
+    {
+        $getRecord = ExamModel::getSingle($id);
 
-        return redirect()->back()->with('success', "Exam Successfully Deleted");
-    } else {
-        abort(404);
+        if (!empty($getRecord)) {
+            $getRecord->is_delete = 1;
+            $getRecord->save();
+
+            return redirect()->back()->with('success', "Exam Successfully Deleted");
+        } else {
+            abort(404);
+        }
     }
-  }
+
      
     public function exam_schedule(Request $request)
     {
@@ -541,30 +556,18 @@ public function MyExamResult()
  */
 public function MyExamResultPrint(Request $request)
 {
-    $user = Auth::user();
-    $students = User::where('parent_id', Auth::id())->get();
+    $exam_id    = $request->exam_id;
+    $student_id = $request->query('student_id');
 
-
-    // ✅ Auto-detect role & assign student_id
-    // if ($user->user_type == 'student') {
-    //     $student_id = $user->id;
-    // } elseif ($user->user_type == 'parent') {
-    //     $student_id = User::where('parent_id', $user->id)->value('id');
-    //     if (!$student_id) {
-    //         return redirect()->back()->with('error', 'No student linked to this parent.');
-    //     }
-    // } else {
-    //     // Admin must pass student_id
-    //     $student_id = $request->student_id;
-    //     if (!$student_id) {
-    //         return redirect()->back()->with('error', 'Student ID is required.');
-    //     }
-    // }
-
-    $exam_id = $request->exam_id;
+    if (!$exam_id) {
+        return back()->with('error', 'Exam ID is missing.');
+    }
 
     // === Exam & Student Info ===
     $data['getExam']    = ExamModel::getSingle($exam_id);
+    if (!$data['getExam']) {
+        return back()->with('error', 'Exam not found.');
+    }
     $data['getStudent'] = User::getSingle($student_id);
     $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
     $data['getSetting'] = SettingModel::getSingle();
@@ -574,7 +577,7 @@ public function MyExamResultPrint(Request $request)
     $dataSubject = [];
 
     foreach ($getExamSubject as $exam) {
-        $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
+        $total_score = ($exam['ca1'] ?? 0) + ($exam['ca2'] ?? 0) + ($exam['ca3'] ?? 0) + ($exam['exam'] ?? 0);
 
         $dataSubject[] = [
             'subject_id'   => $exam['subject_id'],
@@ -585,14 +588,16 @@ public function MyExamResultPrint(Request $request)
             'ca3'          => $exam['ca3'],
             'exam'         => $exam['exam'],
             'total_score'  => $total_score,
-            'full_marks'   => $exam['full_marks'],
-            'passing_mark' => $exam['passing_mark'],
+            'full_marks'   => $exam['full_marks'] ?? null,
+            'passing_mark' => $exam['passing_mark'] ?? null,
         ];
     }
+
+    // <-- IMPORTANT: make sure this is passed to the view
     $data['getExamMarks'] = $dataSubject;
 
     // === Calculate Overall Average ===
-    $average = count($dataSubject) > 0 
+    $average = count($dataSubject) > 0
         ? round(array_sum(array_column($dataSubject, 'total_score')) / count($dataSubject), 2)
         : 0;
     $data['average'] = $average;
@@ -606,76 +611,55 @@ public function MyExamResultPrint(Request $request)
         ->toArray();
 
     $position = array_search($student_id, $ranking);
-    if ($position !== false) {
-        $pos = $position + 1; // 0-based index
-        $data['position'] = $this->ordinal($pos);
-    } else {
-        $data['position'] = '-';
-    }
+    $data['position'] = ($position !== false) ? $this->ordinal($position + 1) : '-';
 
-    $exam_id = $request->exam_id;
-if (!$exam_id) {
-    return back()->with('error', 'Exam ID is missing.');
-}
-
-$data['getExam'] = ExamModel::getSingle($exam_id);
-if (!$data['getExam']) {
-    return back()->with('error', 'Exam not found.');
-}
-
-   // === Fetch Remarks (Backward Compatible) ===
-$remark = StudentReportRemark::where('student_id', $student_id)
-    ->where('exam_id', $exam_id)   // ✅ new column for fresh records
-    ->where('class_id', $data['getStudent']->class_id)
-    ->where('term_id', $data['getExam']->term_id)
-    ->where('session_id', $data['getExam']->session_id)
-    ->first();
-
-if (!$remark) {
-    // 🔙 fallback for old records that were saved before exam_id was added
+    // === Fetch Remarks (with exam_id filter, fallback for old records) ===
     $remark = StudentReportRemark::where('student_id', $student_id)
+        ->where('exam_id', $exam_id)
         ->where('class_id', $data['getStudent']->class_id)
         ->where('term_id', $data['getExam']->term_id)
         ->where('session_id', $data['getExam']->session_id)
         ->first();
-}
 
-$skills = [];
-$behaviours = [];
-$teachers_comment = '';
-$principal_comment = '';
+    if (!$remark) {
+        // fallback for older saved records without exam_id
+        $remark = StudentReportRemark::where('student_id', $student_id)
+            ->where('class_id', $data['getStudent']->class_id)
+            ->where('term_id', $data['getExam']->term_id)
+            ->where('session_id', $data['getExam']->session_id)
+            ->first();
+    }
 
-if ($remark) {
-    $skills = !empty($remark->skills) ? $remark->skills : [];
-    $behaviours = !empty($remark->behaviour) ? $remark->behaviour : [];
-    $teachers_comment = $remark->teachers_comment ?? '';
+    // === Read remarks safely, assume model casts are set (see note below) ===
+    $skills            = $remark->skills ?? [];
+    $behaviours        = $remark->behaviour ?? [];
+    $teachers_comment  = $remark->teacher_comment ?? '';    // singular: teacher_comment
     $principal_comment = $remark->principal_comment ?? '';
 
-    // ✅ Auto-generate comments if missing
+    // Auto-generate only if teacher comment missing
     if (empty($teachers_comment)) {
         if ($average >= 70) {
-            $teachers_comment = "Excellent performance. Keep it up!";
+            $teachers_comment  = "Excellent performance. Keep it up!";
             $principal_comment = "Outstanding! Proud of your achievement.";
         } elseif ($average >= 60) {
-            $teachers_comment = "Good effort. Aim for even higher.";
+            $teachers_comment  = "Good effort. Aim for even higher.";
             $principal_comment = "A commendable performance.";
         } elseif ($average >= 50) {
-            $teachers_comment = "Fair. More dedication is needed.";
+            $teachers_comment  = "Fair. More dedication is needed.";
             $principal_comment = "Encourage to work harder for improvement.";
         } else {
-            $teachers_comment = "Weak performance. Needs serious attention.";
+            $teachers_comment  = "Weak performance. Needs serious attention.";
             $principal_comment = "Student must improve significantly.";
         }
     }
-}
 
-    $data['skills'] = $skills;
-    $data['behaviours'] = $behaviours;
-    $data['teachers_comment'] = $teachers_comment;
+
+    $data['skills']            = $skills;
+    $data['behaviours']        = $behaviours;
+    $data['teachers_comment']  = $teachers_comment;
     $data['principal_comment'] = $principal_comment;
 
-    // dd($remark);
-
+    // return view with $data (each key becomes a variable in the Blade)
     return view('exam_result_print', $data);
 }
 
@@ -816,6 +800,104 @@ public function saveReportRemark(Request $request)
     return redirect('teacher/remarks_report')->with('success', "All student remarks saved successfully");
 }   
 
+public function marksRegisterSubjectTeacher(Request $request)
+{
+    $teacher_id = Auth::id();
+
+    $getExam = ExamModel::where('is_delete', 0)
+        ->select('id as exam_id', 'name as exam_name')
+        ->get();
+
+    $getClass = AssignSubjectTeacherModel::where('teacher_id', $teacher_id)
+        ->where('is_delete', 0)
+        ->with('class')
+        ->get()
+        ->pluck('class')
+        ->filter()
+        ->unique('id')
+        ->values();
+
+    $getSubject = collect();
+    $getStudent = collect();
+
+    return view('teacher.marks_register', compact(
+        'getExam', 'getClass', 'getSubject', 'getStudent'
+    ));
+}
+
+public function submitMarksRegister(Request $request)
+{
+    $teacher_id = Auth::id();
+    
+    $student_id = $request->student_id;
+    $exam_id = $request->exam_id;
+    $class_id = $request->class_id;
+
+    foreach($request->mark as $mark) {
+        // Ensure teacher can only insert for assigned subjects
+        $assigned = AssignSubjectTeacherModel::where([
+            ['teacher_id', $teacher_id],
+            ['class_id', $class_id],
+            ['subject_id', $mark['subject_id']],
+            ['is_delete', 0]
+        ])->exists();
+
+        if(!$assigned) continue; // skip subjects not assigned to this teacher
+
+        $record = MarksRegisterModel::updateOrCreate(
+            [
+                'student_id' => $student_id,
+                'subject_id' => $mark['subject_id'],
+                'exam_id'    => $exam_id,
+                'class_id'   => $class_id
+            ],
+            [
+                'ca1' => $mark['ca1'] ?? 0,
+                'ca2' => $mark['ca2'] ?? 0,
+                'ca3' => $mark['ca3'] ?? 0,
+                'exam' => $mark['exam'] ?? 0,
+                'teacher_id' => $teacher_id
+            ]
+        );
+    }
+
+    return response()->json(['message' => 'Marks saved successfully']);
+}
+
+public function singleSubmitMarksRegister(Request $request)
+{
+    $teacher_id = Auth::id();
+
+    $assigned = AssignSubjectTeacherModel::where([
+        ['teacher_id', $teacher_id],
+        ['class_id', $request->class_id],
+        ['subject_id', $request->subject_id],
+        ['is_delete', 0]
+    ])->exists();
+
+    if(!$assigned) {
+        return response()->json(['message' => 'Unauthorized!']);
+    }
+
+    MarksRegisterModel::updateOrCreate(
+        [
+            'student_id' => $request->student_id,
+            'subject_id' => $request->subject_id,
+            'exam_id'    => $request->exam_id,
+            'class_id'   => $request->class_id
+        ],
+        [
+            'ca1' => $request->ca1 ?? 0,
+            'ca2' => $request->ca2 ?? 0,
+            'ca3' => $request->ca3 ?? 0,
+            'exam' => $request->exam ?? 0,
+            'teacher_id' => $teacher_id
+        ]
+    );
+
+    return response()->json(['message' => 'Mark saved successfully']);
+}
+
 //parent side
     public function ParentMyExamTimetable($student_id)
     {
@@ -857,27 +939,34 @@ public function saveReportRemark(Request $request)
 
 public function ParentMyExamResult(Request $request, $student_id)
 {
-     $parentId = Auth::id();
+    $parentId = Auth::id();
 
-    // all the children for this parent
+    // All the children for this parent
     $students = User::where('parent_id', $parentId)->get();
 
-    // all the exams you want to display (or the current exam)
+    // All the exams you want to display
     $exams = ExamModel::all();   // or your own filtering
 
-    return view('parent.my_exam_result_index', [
-        'students' => $students,
-        'exams'    => $exams,
-    ]);
-    // Read from query string
-    // $exam_id    = $request->query('exam_id');     // or $request->input('exam_id')
-    // $student_id = $request->query('student_id');  // overwrites the route param with the real one
+    // ─── If NO exam_id is supplied, just show the list page with print links ───
+    if (!$request->has('exam_id')) {
+        return view('parent.my_exam_result_index', [
+            'students' => $students,
+            'exams'    => $exams,
+        ]);
+    }
+
+    // ─── If exam_id IS supplied, build the printable result ───
+    $exam_id = $request->query('exam_id');   // from ?exam_id=...
+    // student_id comes from the route parameter
 
     // Guard against missing params
-    // if (!$exam_id || !$student_id) {
-    //     return back()->with('error', 'Missing exam_id or student_id.');
-    // }
+    if (!$exam_id || !$student_id) {
+        return back()->with('error', 'Missing exam_id or student_id.');
+    }
 
+    // ===== Basic data =====
+    $data['students'] = $students; // still pass to view if you need links again
+    $data['exams']    = $exams;
     $data['getExam']    = ExamModel::getSingle($exam_id);
     $data['getStudent'] = User::getSingle($student_id);
     $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
@@ -917,6 +1006,8 @@ public function ParentMyExamResult(Request $request, $student_id)
 
     $data['header_title'] = "My Exam Result";
 
+    // Render the printable single-result view
     return view('parent.my_exam_result', $data);
- }
+}
+
 }

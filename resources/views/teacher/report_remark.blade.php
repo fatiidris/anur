@@ -83,7 +83,7 @@
                             <th>Skills (1–5)</th>
                             <th>Behaviour (1–5)</th>
                             <th>Teacher Comment</th>
-                            <th>Principal Comment</th>
+                            <th class="d-none">Principal Comment</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,9 +125,9 @@
                                     data-student="{{ $student->id }}">{{ $remark->teacher_comment ?? '' }}</textarea>
                             </td>
 
-                            <td>
-                                <textarea name="remarks[{{ $student->id }}][principal_comment]" 
-                                    class="form-control auto-comment-principal" rows="2"
+                            <td style="display:none;"> {{-- hidden visually but still in the DOM --}}
+                                <textarea name="remarks[{{ $student->id }}][principal_comment]"
+                                    class="form-control auto-comment-principal d-none" rows="2"
                                     data-student="{{ $student->id }}">{{ $remark->principal_comment ?? '' }}</textarea>
                             </td>
                         </tr>

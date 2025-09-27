@@ -27,7 +27,7 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <!-- form start -->
-                       <form method="post" action="{{ url('admin/examinations/exam/add') }}">
+                        <form method="post" action="{{ url('admin/examinations/exam/add') }}">
                             @csrf
                             <div class="card-body">
                                 @include('_message')
@@ -56,6 +56,20 @@
                                     <label>Exam Name</label>
                                     <input type="text" id="name" class="form-control" name="name" value="{{ old('name') }}" required>
                                 </div>
+
+                                {{-- ✅ NEW: Marks entry window --}}
+                                <div class="form-group">
+                                    <label>Marks Entry Start</label>
+                                    <input type="datetime-local" name="marks_entry_start"
+                                           value="{{ old('marks_entry_start') }}" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Marks Entry End</label>
+                                    <input type="datetime-local" name="marks_entry_end"
+                                           value="{{ old('marks_entry_end') }}" class="form-control">
+                                </div>
+                                {{-- ✅ END new fields --}}
 
                                 <div class="form-group">
                                     <label>Status</label>

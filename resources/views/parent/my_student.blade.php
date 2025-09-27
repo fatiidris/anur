@@ -77,15 +77,13 @@
                           <i class="fas fa-calendar-alt"></i>
                         </a>
                     @foreach($students as $student)
-    @foreach($exams as $exam)
-        <a class="btn btn-primary btn-sm" target="_blank"
-           href="{{ url('parent/my_exam_result/print?exam_id='.$exam->id.'&student_id='.$student->id) }}">
-            <i class="fas fa-file-alt"></i> Print {{ $student->name }} – {{ $exam->name }}
-        </a>
-    @endforeach
-@endforeach
-
-
+                      @foreach($exams as $exam)
+                          <a class="btn btn-primary btn-sm" target="_blank"
+                            href="{{ url('parent/my_exam_result/print?exam_id='.$exam->id.'&student_id='.$student->id) }}">
+                              <i class="fas fa-file-alt"></i> Print {{ $student->name }} – {{ $exam->name }}
+                          </a>
+                      @endforeach
+                  @endforeach
 
                         <a style="margin-bottom: 10px;" class="btn btn-warning btn-sm" href="{{url('parent/my_student/calender/'.$value->id)}}" title="Calendar">
                           <i class="fas fa-calendar"></i>

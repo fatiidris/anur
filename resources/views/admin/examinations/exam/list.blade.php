@@ -78,6 +78,9 @@
                         <th>Exam Name</th>
                         <th>Session</th>
                         <th>Term</th>
+                        <!-- ✅ Added columns -->
+                        <th>Marks Entry Start</th>
+                        <th>Marks Entry End</th>
                         <th>Created By</th>
                         <th>Created Date</th>
                         <th>Action</th>
@@ -90,9 +93,20 @@
                             <td>{{ $value->name }}</td>
                             <td>{{ $value->session->name ?? 'N/A' }}</td>
                             <td>{{ $value->term->name ?? 'N/A' }}</td>
+                            <!-- ✅ Show start/end times, formatted -->
+                            <td>
+                                {{ $value->marks_entry_start
+                                    ? date('d-m-Y H:i A', strtotime($value->marks_entry_start))
+                                    : '—' }}
+                            </td>
+                            <td>
+                                {{ $value->marks_entry_end
+                                    ? date('d-m-Y H:i A', strtotime($value->marks_entry_end))
+                                    : '—' }}
+                            </td>
                             <td>{{ $value->creator->name ?? 'N/A' }}</td>
                             <td>{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                            <td>
+                            <td style="min-width: 150px">
                                 <a href="{{ url('admin/examinations/exam/edit/'.$value->id) }}" class="btn btn-sm btn-primary">Edit</a>
                                 <a href="{{ url('admin/examinations/exam/delete/'.$value->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                             </td>

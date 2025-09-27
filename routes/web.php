@@ -12,6 +12,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\AssignClassTeacherController;
+use App\Http\Controllers\AssignSubjectTeacherController;
 use App\Http\Controllers\ClassTimetableController;
 use App\Http\Controllers\ExaminationsController;
 use App\Http\Controllers\SessionController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\HomeworkController;
 use App\Http\Controllers\FeesCollectionController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FrontendController;
+
 
 
 
@@ -174,6 +176,14 @@ Route::group(['middleware' => 'admin'], function(){
     Route::post('admin/assign_class_teacher/edit_single/{id}', [AssignClassTeacherController::class, 'update_single']);
     Route::get('admin/assign_class_teacher/delete/{id}', [AssignClassTeacherController::class, 'delete']);
 
+    // assign_subject_teacher
+    Route::get('admin/assign_subject_teacher/list', [AssignSubjectTeacherController::class, 'list']);
+    Route::get('admin/assign_subject_teacher/add', [AssignSubjectTeacherController::class, 'add']);
+    Route::post('admin/assign_subject_teacher/add', [AssignSubjectTeacherController::class, 'insert']);
+    Route::get('admin/assign_subject_teacher/edit/{id}', [AssignSubjectTeacherController::class, 'edit']);
+    Route::post('admin/assign_subject_teacher/edit/{id}', [AssignSubjectTeacherController::class, 'update']);
+    Route::get('admin/assign_subject_teacher/delete/{id}', [AssignSubjectTeacherController::class, 'delete']);
+
     //EXAMINATION
     Route::get('admin/examinations/exam/list', [ExaminationsController::class, 'exam_list']);
     Route::get('admin/examinations/exam/add', [ExaminationsController::class, 'exam_add']);
@@ -274,6 +284,10 @@ Route::group(['middleware' => 'admin'], function(){
     Route::get('teacher/marks_register', [ExaminationsController::class, 'marks_register_teacher']);
     Route::post('teacher/submit_marks_register', [ExaminationsController::class, 'submit_marks_register']);
     Route::post('teacher/single_submit_marks_register', [ExaminationsController::class, 'single_submit_marks_register']);
+
+    Route::get('teacher/my_subject_marks', [ExaminationsController::class, 'marksRegisterSubjectTeacher']);
+    Route::post('teacher/submit_marks_register', [ExaminationsController::class, 'submitMarksRegister']);
+    Route::post('teacher/single_submit_marks_register', [ExaminationsController::class, 'singleSubmitMarksRegister']);
     Route::get('teacher/my_exam_result/print', [ExaminationsController::class, 'MyExamResultPrint']);
 
     Route::get('teacher/remarks_report', [ExaminationsController::class, 'reportRemark']);

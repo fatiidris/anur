@@ -281,10 +281,15 @@
 
   {{-- SIGNATURE & PAYMENT STATUS --}}
   <div class="signature-row">
-    <div class="sign">
-      <div style="height:48px;"></div>
-      <div>Principal's Signature</div>
+    <div class="sign" style="text-align:center;">
+        <!-- Principal Signature Image -->
+        <img src="{{ url ('public/frontend/Img/user.jpg') }}" 
+             alt=""
+             style="max-width:180px; height:auto; margin-bottom:6px;">
+
+        <div>Principal's Signature</div>
     </div>
+</div>
 
     @if(!empty($getStudent))
         @php

@@ -61,6 +61,22 @@
                                         value="{{ old('name', $getRecord->name) }}" readonly required>
                                 </div>
 
+                                <!-- ✅ Marks Entry Start -->
+                                <div class="form-group">
+                                    <label>Marks Entry Start</label>
+                                    <input type="datetime-local" name="marks_entry_start" class="form-control"
+                                           value="{{ old('marks_entry_start', optional($getRecord->marks_entry_start)->format('Y-m-d\TH:i')) }}">
+                                </div>
+
+                                <!-- ✅ Marks Entry End -->
+                                <div class="form-group">
+                                    <label>Marks Entry End</label>
+                                    <input type="datetime-local" name="marks_entry_end" class="form-control"
+                                           value="{{ old('marks_entry_end', optional($getRecord->marks_entry_end)->format('Y-m-d\TH:i')) }}">
+                                </div>
+
+                            </div>
+
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </div>
@@ -73,23 +89,23 @@
 </div>
 
 <script>
- document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const sessionSelect = document.getElementById('session_id');
     const termSelect = document.getElementById('term_id');
-    const examNameInput = document.getElementById('exam_name'); // FIXED: should match the input ID
+    const examNameInput = document.getElementById('exam_name');
 
     function updateExamName() {
         const sessionText = sessionSelect.options[sessionSelect.selectedIndex]?.text || '';
-        const termText = termSelect.options[termSelect.selectedIndex]?.text.split(' (')[0] || ''; // Extract term name only
+        const termText = termSelect.options[termSelect.selectedIndex]?.text.split(' (')[0] || '';
         examNameInput.value = (termText && sessionText) ? `${termText}, ${sessionText}` : '';
     }
 
     sessionSelect.addEventListener('change', updateExamName);
     termSelect.addEventListener('change', updateExamName);
 
-    // Initialize on page load if already selected (for Edit page)
+    // Initialize on page load (Edit page pre-fill)
     updateExamName();
- });
+});
 </script>
 
 @endsection

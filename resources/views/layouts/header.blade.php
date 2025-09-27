@@ -184,9 +184,18 @@
                   <p>Assign Class Teacher</p>
                 </a>
                </li>
+
+                <li class="nav-item">
+                <a href="{{ url ('admin/assign_subject_teacher/list') }}" class="nav-link  @if(Request::segment(2) == 'assign_subject_teacher') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Assign Subject Teacher</p>
+                </a>
+               </li>
             </ul>
           </li>
     
+
+         
            <li class="nav-item  @if(Request::segment(2) == 'fees_collection')  menu-is-opening menu-open  @endif">
             <a href="#" class="nav-link @if(Request::segment(2) == 'fees_collection')  active  @endif">
               <i class="nav-icon fas fa-table"></i>
@@ -390,6 +399,7 @@
               </p>
             </a>
           </li>
+
           <li class="nav-item">
             <a href="{{ url ('teacher/my_exam_timetable') }}" class="nav-link @if(Request::segment(2) == 'my_exam_timetable') active @endif">
               <i class="nav-icon far fa-user"></i>
@@ -416,6 +426,15 @@
               </p>
             </a>
             </li>
+
+             <li class="nav-item">
+            <a href="{{ url ('teacher/my_subject_marks')}}" class="nav-link @if(Request::segment(2) == 'my_subject') active @endif">
+            <i class="nav-icon far fa-user"></i>
+              <p>
+                My Subject Mark
+              </p>
+            </a>
+          </li>
 
              <li class="nav-item">
             <a href="{{ url ('teacher/remarks_report') }}" class="nav-link @if(Request::segment(2) == 'remarks_report') active @endif">
