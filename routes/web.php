@@ -24,6 +24,7 @@ use App\Http\Controllers\HomeworkController;
 use App\Http\Controllers\FeesCollectionController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\FrontendSettingController;
 
 
 
@@ -161,6 +162,10 @@ Route::group(['middleware' => 'admin'], function(){
     // settings
     Route::get('admin/setting', [UserController::class, 'Setting']);
     Route::post('admin/setting', [UserController::class, 'UpdateSetting']);
+
+    // frontend settings
+    Route::get('admin/frontend-settings', [FrontendSettingController::class, 'settings']);
+    Route::post('admin/frontend-settings/update', [FrontendSettingController::class, 'update']);
         
     Route::get('admin/change_password', [UserController::class, 'change_password']);
     Route::post('admin/change_password', [UserController::class, 'update_change_password']);

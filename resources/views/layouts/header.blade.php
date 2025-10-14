@@ -353,6 +353,15 @@
          </li>
 
          <li class="nav-item">
+            <a href="{{ url ('admin/frontend-settings') }}" class="nav-link @if(Request::segment(2) == 'frontend-settings') active @endif">
+              <i class="nav-icon far fa-user"></i>
+              <p>
+                Frontend Settings
+              </p>
+            </a>
+         </li>
+
+         <li class="nav-item">
             <a href="{{ url ('admin/setting') }}" class="nav-link @if(Request::segment(2) == 'setting') active @endif">
               <i class="nav-icon far fa-user"></i>
               <p>

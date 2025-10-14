@@ -3,36 +3,43 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\FrontendSettingModel;
 
 class FrontendController extends Controller
 {
     public function home()
     {
-        return view('frontend.home');
+        $data['getRecord'] = FrontendSettingModel::getSingle();
+        return view('frontend.home', $data);
     }
 
     public function about()
     {
-        return view('frontend.about');
+        $data['getRecord'] = FrontendSettingModel::getSingle();
+        return view('frontend.about', $data);
     }
 
     public function admission()
     {
-        return view('frontend.admission');
+        $data['getRecord'] = FrontendSettingModel::getSingle();
+        return view('frontend.admission', $data);
     }
 
     public function contact()
     {
-        return view('frontend.contact');
+        $data['getRecord'] = FrontendSettingModel::getSingle();
+        return view('frontend.contact', $data);
     }
 
     public function updates()
     {
-        return view('frontend.updates');
+        $data['getRecord'] = FrontendSettingModel::getSingle();
+        return view('frontend.updates', $data);
     }
 
     public function results()
     {
-        return view('frontend.results');
+        $data['getRecord'] = FrontendSettingModel::getSingle();
+        return view('frontend.results', $data);
     }
 }

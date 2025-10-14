@@ -12,7 +12,7 @@ class SettingModel extends Model
 
     static public function getSingle()
     {
-        return self::find(1);
+        return self::firstOrNew([]);
     }
 
     public function getLogo(){
