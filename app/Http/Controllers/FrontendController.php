@@ -3,27 +3,30 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\FrontendSettingModel;
 
 class FrontendController extends Controller
 {
     public function home()
     {
-        return view('frontend.home');
+        $getSetting = FrontendSettingModel::getSingle();
+        return view('admin.frontend.home');
     }
 
     public function about()
     {
-        return view('frontend.about');
+        $getSetting = FrontendSettingModel::getSingle();
+        return view('admin.frontend.about');
     }
 
     public function admission()
     {
-        return view('frontend.admission');
+        return view('admin.frontend.admission');
     }
 
     public function contact()
     {
-        return view('frontend.contact');
+        return view('admin.frontend.contact');
     }
 
     public function updates()
@@ -33,6 +36,6 @@ class FrontendController extends Controller
 
     public function results()
     {
-        return view('frontend.results');
+        return view('admin.frontend.results');
     }
 }

@@ -24,6 +24,7 @@ use App\Http\Controllers\HomeworkController;
 use App\Http\Controllers\FeesCollectionController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\FrontendSettingController;
 
 
 
@@ -264,7 +265,11 @@ Route::group(['middleware' => 'admin'], function(){
     Route::get('admin/fees_collection/add_collect_fees/{student_id}', [FeesCollectionController::class, 'collect_fees_add']);
     Route::post('admin/fees_collection/add_collect_fees/{student_id}', [FeesCollectionController::class, 'collect_fees_insert']);
 
-
+    // frontend settings
+   Route::get('admin/frontend-settings', [FrontendSettingController::class, 'FrontSetting']);
+//    Route::post('admin/front/setting/update', [FrontendSettingController::class, 'UpdateFrontSetting']);
+      Route::post('admin/frontend-settings', [FrontendSettingController::class, 'UpdateFrontSetting'])
+    ->name('admin.frontend-settings.update');  
     }); 
 
     Route::group(['middleware' => 'teacher'], function(){

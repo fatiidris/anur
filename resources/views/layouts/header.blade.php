@@ -352,14 +352,32 @@
             </a>
          </li>
 
-         <li class="nav-item">
-            <a href="{{ url ('admin/setting') }}" class="nav-link @if(Request::segment(2) == 'setting') active @endif">
-              <i class="nav-icon far fa-user"></i>
+         <li class="nav-item  @if(Request::segment(2) == 'setting')  menu-is-opening menu-open  @endif">
+            <a href="#" class="nav-link @if(Request::segment(2) == 'setting')  active  @endif">
+              <i class="nav-icon fas fa-table"></i>
               <p>
-                Setting
+               Settings
+                <i class="fas fa-angle-left right"></i>
               </p>
             </a>
-         </li>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                  <a href="{{ url ('admin/setting') }}" class="nav-link @if(Request::segment(2) == 'setting') active @endif">
+                    <i class="nav-icon far fa-user"></i>
+                    <p>
+                      Setting
+                    </p>
+                  </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url ('admin/frontend-settings') }}" class="nav-link @if(Request::segment(2) == 'frontend-settings') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>FrontEnd Setting</p>
+                </a>
+              </li>
+            </ul>
+          </li>
 
 
             <li class="nav-item">

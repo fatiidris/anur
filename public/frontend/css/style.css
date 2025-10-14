@@ -295,26 +295,26 @@ nav .fa {
 }
 .carousel-item1 {
   background: linear-gradient(rgb(0, 0, 0, 0.5), rgb(0, 0, 0, 0.5)),
-    url("../Img/image1.jpg") no-repeat center;
+    /* url("../Img/image1.jpg") no-repeat center; */
   background-size: cover;
   height: 80vh;
 }
 .carousel-item2 {
   background: linear-gradient(rgb(0, 0, 0, 0.5), rgb(0, 0, 0, 0.5)),
-    url("../Img/image2.jpg") center;
+    /* url("../Img/image2.jpg") center; */
   background-repeat: no-repeat;
   background-size: cover;
   height: 80vh;
 }
 .carousel-item3 {
   background: linear-gradient(rgb(0, 0, 0, 0.5), rgb(0, 0, 0, 0.5)),
-    url("../Img/image3.jpg") no-repeat center;
+    /* url("../Img/image3.jpg") no-repeat center; */
   background-size: cover;
   height: 80vh;
 }
 .carousel-item4 {
   background: linear-gradient(rgb(0, 0, 0, 0.5), rgb(0, 0, 0, 0.5)),
-    url("../Img/images.jpg") no-repeat center;
+    /* url("../Img/images.jpg") no-repeat center; */
   background-size: cover;
   height: 80vh;
 }
@@ -359,8 +359,8 @@ nav .fa {
   height: 40vh;
   width: 100%;
   background-image: linear-gradient(rgba(4, 9, 30, 0.7), rgba(4, 9, 30, 0.7)),
-    url(../Img/image10.jpg);
-  background-position: center;
+    /* url(../Img/image10.jpg);*/
+  background-position: center; 
   background-size: cover;
 }
 .sub-header h1 {

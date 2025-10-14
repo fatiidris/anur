@@ -53,6 +53,17 @@ class UserController extends Controller
 
             $setting->fevicon_icon = $fevicon_icon;
        }
+
+       if(!empty($request->file('principal_signature')))
+       {
+            $ext = $request->file('principal_signature')->getClientOriginalExtension();
+            $file = $request->file('principal_signature');
+            $randomStr = date('Ymdhis').Str::random(10);
+            $principal_signature = strtolower($randomStr).'.'.$ext;
+            $file->move('upload/setting/', $principal_signature);
+
+            $setting->principal_signature = $principal_signature;
+       }
         $setting->save();
 
          return redirect()->back()->with('success', "Setting Successfully Updated");

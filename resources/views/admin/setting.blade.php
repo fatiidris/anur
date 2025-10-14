@@ -61,6 +61,15 @@
                   </div>
 
                   <div class="form-group">
+                    <label>Principal Signature<span style="color: red;"></span></label>
+                    <input type="file" class="form-control" name="principal_signature">
+                    <div style="color: red"> {{ $errors->first('principal_signature')}} </div>
+                    @if(!empty($getRecord->getPrincipalSign()))
+                    <img src="{{ $getRecord->getPrincipalSign() }}" style="width: auto;height: 50px;" alt="">
+                    @endif
+                  </div>
+
+                  <div class="form-group">
                     <label>School Name</label>
                     <input type="text" class="form-control" name="school_name" value= "{{ $getRecord->school_name }}">
                   </div>

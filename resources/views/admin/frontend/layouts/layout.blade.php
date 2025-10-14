@@ -16,12 +16,12 @@
   <body>
     <body id="top">
         <div class="whole-container">
-         @include('frontend.layouts.header')
+         @include('admin.frontend.layouts.header')
     </div>
 
     @yield('content')
     
-   @include('frontend.layouts.footer') 
+   @include('admin.frontend.layouts.footer') 
 <script src="{{ url ('public/frontend/JS/script.js') }}"></script>
 <script src="{{ url ('public/frontend/JS/bootstrap.bundle.min.js') }}"></script>
   </body>

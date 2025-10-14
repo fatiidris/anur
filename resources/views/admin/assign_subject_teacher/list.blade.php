@@ -10,7 +10,7 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Subject Teacher List</h1>
+          <h1>Subject Teacher List ({{ $getRecord->total() }})</h1>
         </div>
         <div class="col-sm-6 text-right">
           <a href="{{ url('admin/assign_subject_teacher/add') }}" class="btn btn-primary">
@@ -20,6 +20,44 @@
       </div>
     </div><!-- /.container-fluid -->
   </section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Search Assign Subject Teacher</h3>
+        </div>
+
+          <!-- form start -->
+          <form method="get"  action="" > 
+            <div class="card-body">
+              <div class="row">
+              <div class="form-group col-md-3">
+                <label>Class Name</label>
+                <input type="text" class="form-control" name="class_name" value="{{ Request::get('class_name') }}" placeholder="Class Name">
+              </div>
+              
+              <div class="form-group col-md-3">
+                <label>Teachers Name</label>
+                <input type="text" class="form-control" name="teacher_name" value="{{ Request::get('teacher_name') }}" placeholder="Teacher Name">
+              </div>
+              <div class="form-group col-md-3">
+                <label>Subject Name</label>
+                <input type="text" class="form-control" name="subject_name" value="{{ Request::get('subject_name') }}" placeholder="Subject Name">
+              </div>
+              
+                <div class="form-group col-md-2">
+                <button class="btn btn-primary" type="submit" style="margin-top: 30px;">Search</button>
+                <a href="{{ url('admin/assign_subject_teacher/list')}}" class="btn btn-success" style="margin-top: 30px;">Reset</a>
+              </div>
+                </div>
+              </div>
+          </form>
+        </div>
+
 
   <!-- Main content -->
   <section class="content">
@@ -48,8 +86,8 @@
                       <td>{{ $index + 1 }}</td>
                       <td>{{ $value->class_name }}</td>
                       <td> {{ $value->subject_name }} </td>
-                       <td> {{ $value->teacher_name }} {{ $value->teacher_last_name }}</td>
-                       <td> {{ $value->created_by_name }} </td>
+                      <td> {{ $value->teacher_name }} {{ $value->teacher_last_name }}</td>
+                      <td> {{ $value->created_by_name }} </td>
                       <td>
                         @if($value->status == 0)
                           <span class="badge badge-success">Active</span>
@@ -61,12 +99,10 @@
                         <a href="{{ url('admin/assign_subject_teacher/edit/'.$value->id) }}"
                            class="btn btn-sm btn-primary">Edit</a>
 
-                        <!-- <a href="{{ url('admin/assign_subject_teacher/edit_single/'.$value->id) }}"
-                           class="btn btn-sm btn-warning">Edit Single</a> -->
-
+                        {{-- NOTE: Removed 'onclick="return confirm(...)"' as direct browser alerts are not supported. 
+                             Replace with a custom modal for confirmation. --}}
                         <a href="{{ url('admin/assign_subject_teacher/delete/'.$value->id) }}"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Are you sure you want to delete this record?')">
+                           class="btn btn-sm btn-danger">
                            Delete
                         </a>
                       </td>

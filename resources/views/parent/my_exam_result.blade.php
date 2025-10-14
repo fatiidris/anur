@@ -9,21 +9,35 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>My Exam Result<span style="color: blue;">({{ $getStudent->name }} {{ $getStudent->last_name }})</span></h1>
-          </div> 
+            <h1>
+              My Exam Result 
+              <span style="color: blue;">
+                ({{ $getStudent->name }} {{ $getStudent->last_name }})
+              </span>
+            </h1>
+          </div>
         </div>
       </div><!-- /.container-fluid -->
     </section>
+
+    <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
         <div class="row">
+
           @foreach($getRecord as $value)
           <div class="col-md-12">
-        <div class="card">
-        <div class="card-header">
-           <h3 class="card-title">{{ $value['exam_name']}}</h3>
-           <a class="btn btn-primary btn-sm" style="float: right;" target="_blanck" href="{{ url('parent/my_exam_result/print?exam_id='.$value['exam_id'].'&student_id='.$getStudent->id) }}">Print</a>
-        </div>
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">{{ $value['exam_name'] }}</h3>
+                <a class="btn btn-primary btn-sm" 
+                   style="float: right;" 
+                   target="_blank"
+                   href="{{ url('parent/my_exam_result/print?exam_id='.$value['exam_id'].'&student_id='.$getStudent->id) }}">
+                   Print
+                </a>
+              </div>
+
               <div class="card-body p-0">
                 <table class="table table-striped">
                   <thead>
@@ -36,7 +50,7 @@
                       <th>Total Score</th>
                       <th>Passing Mark</th>
                       <th>Full Marks</th>
-                      <th>RESULTS</th>
+                      <th>Results</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -45,89 +59,89 @@
                       $full_marks = 0;
                       $result_validation = 0;
                     @endphp
+
                     @foreach($value['subject'] as $exam)
-                    @php
-                      $total_score = $total_score + $exam['total_score'];
-                      $full_marks = $full_marks + $exam['full_marks'];
-                    @endphp
-                  <tr>
-                    <td style="width: 300px;">{{ $exam['subject_name']}}</td>
-                    <td>{{ $exam['ca1']}}</td>
-                    <td>{{ $exam['ca2']}}</td>
-                    <td>{{ $exam['ca3']}}</td>
-                    <td>{{ $exam['exam']}}</td>
-                    <td>{{ $exam['total_score']}}</td>
-                    <td>{{ $exam['passing_mark']}}</td>
-                    <td>{{ $exam['full_marks']}}</td>
-                    <td>
-                        @if($exam['total_score'] >= $exam['passing_mark'])
-                            <span style="color: green; font-weight: bold;">Pass</span>
-                        @else
-                        @php
-                          $result_validation = 1;
-                        @endphp
-                            <span style="color: red; font-weight: bold;">Fail</span>
-                        @endif
-                    </td>
-
-                  </tr>
-                  @endforeach  
-                  <tr>
-                    <td colspan="2">
-                      <b>Grand Total: {{ $total_score }}/{{ $full_marks }}</b>
-                    </td>
-                    <td colspan="2">
-                    @php
-                        $Percentage = ($total_score * 100)/ $full_marks;
-                        $getGrade = App\Models\MarksGradeModel::getGrade($Percentage);
+                      @php
+                        $total_score += $exam['total_score'];
+                        $full_marks  += $exam['full_marks'];
                       @endphp
-                      <b>Percentage: {{ round($Percentage, 2) }}%</b>
-                    </td>
-                    <td colspan="2">
-                      <b>Grade: {{ $getGrade }}</b>
-                    </td>
-                    <td colspan="3">
-                      <b>Result:  @php
-                                          // Determine grade based on percentage
-                                          $gradeLabel = '';
-                                          $gradeColor = 'black'; // default text color
+                      <tr>
+                        <td style="width: 300px;">{{ $exam['subject_name'] }}</td>
+                        <td>{{ $exam['ca1'] }}</td>
+                        <td>{{ $exam['ca2'] }}</td>
+                        <td>{{ $exam['ca3'] }}</td>
+                        <td>{{ $exam['exam'] }}</td>
+                        <td>{{ $exam['total_score'] }}</td>
+                        <td>{{ $exam['passing_mark'] }}</td>
+                        <td>{{ $exam['full_marks'] }}</td>
+                        <td>
+                          @if($exam['total_score'] >= $exam['passing_mark'])
+                            <span style="color: green; font-weight: bold;">Pass</span>
+                          @else
+                            @php $result_validation = 1; @endphp
+                            <span style="color: red; font-weight: bold;">Fail</span>
+                          @endif
+                        </td>
+                      </tr>
+                    @endforeach  
 
-                                          if ($percentage >= 70) {
-                                              $gradeLabel = 'A - Distinction';
-                                              $gradeColor = 'green';
-                                          } elseif ($percentage >= 60) {
-                                              $gradeLabel = 'B - Very Good';
-                                              $gradeColor = 'blue';
-                                          } elseif ($percentage >= 50) {
-                                              $gradeLabel = 'C - Credit';
-                                              $gradeColor = '#006400'; // dark green
-                                          } elseif ($percentage >= 45) {
-                                              $gradeLabel = 'D - Pass';
-                                              $gradeColor = '#8B8000'; // golden brown
-                                          } elseif ($percentage >= 40) {
-                                              $gradeLabel = 'E - Fair';
-                                              $gradeColor = 'orange';
-                                          } else {
-                                              $gradeLabel = 'Fail';
-                                              $gradeColor = 'red';
-                                          }
-                                      @endphp
+                    @php
+                      $Percentage = ($full_marks > 0) ? ($total_score * 100) / $full_marks : 0;
+                      $getGrade   = App\Models\MarksGradeModel::getGrade($Percentage);
 
-                                      <b>Result :</b>
-                                      <span style="color: {{ $gradeColor }}; font-weight: bold;">
-                                          {{ $gradeLabel }}
-                                      </span>
-                             </td>
-                       </tr>    
+                      // Determine grade label & color
+                      $gradeLabel = '';
+                      $gradeColor = 'black';
+                      if ($Percentage >= 70) {
+                          $gradeLabel = 'A - Distinction';
+                          $gradeColor = 'green';
+                      } elseif ($Percentage >= 60) {
+                          $gradeLabel = 'B - Very Good';
+                          $gradeColor = 'blue';
+                      } elseif ($Percentage >= 50) {
+                          $gradeLabel = 'C - Credit';
+                          $gradeColor = '#006400'; // dark green
+                      } elseif ($Percentage >= 45) {
+                          $gradeLabel = 'D - Pass';
+                          $gradeColor = '#8B8000'; // golden brown
+                      } elseif ($Percentage >= 40) {
+                          $gradeLabel = 'E - Fair';
+                          $gradeColor = 'orange';
+                      } else {
+                          $gradeLabel = 'Fail';
+                          $gradeColor = 'red';
+                      }
+                    @endphp
+
+                    <tr>
+                      <td colspan="2">
+                        <b>Grand Total: {{ $total_score }}/{{ $full_marks }}</b>
+                      </td>
+                      <td colspan="2">
+                        <b>Percentage: {{ round($Percentage, 2) }}%</b>
+                      </td>
+                      <td colspan="2">
+                        <b>Grade: {{ $getGrade }}</b>
+                      </td>
+                      <td colspan="3">
+                        <b>Result:</b>
+                        <span style="color: {{ $gradeColor }}; font-weight: bold;">
+                          {{ $gradeLabel }}
+                        </span>
+                      </td>
+                    </tr>    
+
                   </tbody>
                 </table>                     
-                </div>
               </div>
-          </div> 
-          @endforeach     
+            </div>
+          </div>
+          @endforeach
+
         </div>
       </div>
     </section>
   </div>
   <!-- /.content-wrapper -->
-  @endsection
+
+@endsection

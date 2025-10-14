@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\ExamModel;
 use App\Exports\ExportParent;
 use Hash;
 use Auth;
@@ -152,7 +153,8 @@ class ParentController extends Controller
         $data['getParent'] = User::getSingle($id);
         $data['parent_id'] = $id;
         $data['getSearchStudent'] = User::getSearchStudent();
-        $data['getRecord'] = User::getMyStudent($id);  
+        $data['getRecord'] = User::getMyStudent($id);
+        $data['exams'] = ExamModel::all();  
         $data['header_title'] = "Parent Student List";
         return view('admin.parent.my_student', $data);
     }
@@ -178,7 +180,11 @@ class ParentController extends Controller
     public function myStudentParent()
     {
         $id = Auth::user()->id;
-        $data['getRecord'] = User::getMyStudent($id);  
+        $data['getRecord'] = User::getMyStudent($id); 
+        
+        $data['exams'] = ExamModel::all();
+        $data['students'] = $data['getRecord'];
+
         $data['header_title'] = "My Student";
         return view('parent.my_student', $data);
 

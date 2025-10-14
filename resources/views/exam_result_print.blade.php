@@ -171,7 +171,35 @@
       <td>{{ $ca3 }}</td>
       <td>{{ $examScore }}</td>
       <td>{{ $total }}</td>
-      <td>{{ $grade }}</td>
+      @php
+   $gradeLabel = '';
+   $gradeColor = 'black';
+
+   if ($total >= 70) {
+       $gradeLabel = 'A - Distinction';
+       $gradeColor = 'green';
+   } elseif ($total >= 60) {
+       $gradeLabel = 'B - Very Good';
+       $gradeColor = 'blue';
+   } elseif ($total >= 50) {
+       $gradeLabel = 'C - Credit';
+       $gradeColor = '#006400'; // dark green
+   } elseif ($total >= 45) {
+       $gradeLabel = 'D - Pass';
+       $gradeColor = '#8B8000'; // golden brown
+   } elseif ($total >= 40) {
+       $gradeLabel = 'E - Fair';
+       $gradeColor = 'orange';
+   } else {
+       $gradeLabel = 'Fail';
+       $gradeColor = 'red';
+   }
+@endphp
+
+<td style="color: {{ $gradeColor }}; font-weight:bold;">
+   {{ $gradeLabel }}
+</td>
+
       <td>{{ $subjectPosition }}</td>
       <td>{{ $classAverage }}</td>
       <td>{{ $classLowest }}</td>
@@ -229,8 +257,42 @@
         <tr><th>Principal Comment</th></tr>
         <tr><td>{{ $principalComment }}</td></tr>
         <tr><th>Summary</th></tr>
-        <tr><td>Percentage: {{ round($Percentage, 2) }}%</td></tr>
-        <tr><td>Overall Average: {{ $overallAverage }}</td></tr>
+       <tr><td style="color: font-weight:bold;">Percentage: {{ round($Percentage, 2) }}%</td></tr>
+<tr><td style="color: font-weight:bold;">Overall Average: {{ $overallAverage }}</td></tr>
+
+@php
+   $finalGradeLabel = '';
+   $finalGradeColor = 'black';
+
+   if ($Percentage >= 70) {
+       $finalGradeLabel = 'A - Distinction';
+       $finalGradeColor = 'green';
+   } elseif ($Percentage >= 60) {
+       $finalGradeLabel = 'B - Very Good';
+       $finalGradeColor = 'blue';
+   } elseif ($Percentage >= 50) {
+       $finalGradeLabel = 'C - Credit';
+       $finalGradeColor = '#006400'; // dark green
+   } elseif ($Percentage >= 45) {
+       $finalGradeLabel = 'D - Pass';
+       $finalGradeColor = '#8B8000'; // golden brown
+   } elseif ($Percentage >= 40) {
+       $finalGradeLabel = 'E - Fair';
+       $finalGradeColor = 'orange';
+   } else {
+       $finalGradeLabel = 'Fail';
+       $finalGradeColor = 'red';
+   }
+@endphp
+
+<tr>
+   <td>
+      <b>Result:</b>
+      <span style="color: {{ $finalGradeColor }}; font-weight:bold;">
+         {{ $finalGradeLabel }}
+      </span>
+   </td>
+</tr>
     </table>
 
     <table>
@@ -279,18 +341,26 @@
     </table>
  </div>
 
-  {{-- SIGNATURE & PAYMENT STATUS --}}
-  <div class="signature-row">
-    <div class="sign" style="text-align:center;">
-        <!-- Principal Signature Image -->
-        <img src="{{ url ('public/frontend/Img/user.jpg') }}" 
-             alt=""
-             style="max-width:180px; height:auto; margin-bottom:6px;">
+{{-- SIGNATURE & PAYMENT STATUS --}}
+<div class="signature-row" style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
 
-        <div>Principal's Signature</div>
-    </div>
-</div>
+    {{-- Signature Table --}}
+    <table style="border: 1px solid #000; border-collapse: collapse; width: 200px; text-align: center; margin: 0; height: 100%;">
+        <tr>
+            <th style="border-bottom: 1px solid #000; padding: 3px; font-size: 12px; background: #f8f8f8;">
+                Principal's Signature
+            </th>
+        </tr>
+        <tr>
+            <td style="padding: 3px; vertical-align: middle;">
+                <img src="{{ $getSetting->getPrincipalSign() }}" 
+                     alt="Principal Signature" 
+                     style="width:80px; height:auto; border-radius:4px; display:block; margin:0 auto;">
+            </td>
+        </tr>
+    </table>
 
+    {{-- Payment Status Table --}}
     @if(!empty($getStudent))
         @php
             $getFees = \App\Models\StudentAddFeesModel::getTotalAmount($getStudent->id);
@@ -300,16 +370,14 @@
                 : 0;
             $RemainingAmount = $totalAmount - $paid_amount;
 
-            // Blade-safe nested ternary
             $status = $totalAmount == 0 
                 ? 'No payment record found for this student' 
                 : ($RemainingAmount > 0 ? 'Pending' : 'Paid');
         @endphp
 
-
-        <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <table border="1" cellpadding="5" cellspacing="0" width="100%" style="font-size:13px; border-collapse: collapse;">
             <thead>
-                <tr>
+                <tr style="background:#f8f8f8;">
                     <th>Total Amount</th>
                     <th>Paid Amount</th>
                     <th>Balance</th>
@@ -317,7 +385,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr style="text-align:center;">
                     <td>₦{{ number_format($totalAmount ?? 0, 2) }}</td>
                     <td>₦{{ number_format($paid_amount, 2) }}</td>
                     <td>₦{{ number_format($RemainingAmount, 2) }}</td>
@@ -328,7 +396,7 @@
     @else
         <p>No payment record found for this student.</p>
     @endif
-  </div>
+</div>
 
   <script type="text/javascript">
      window.print();

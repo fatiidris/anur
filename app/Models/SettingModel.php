@@ -37,4 +37,15 @@ class SettingModel extends Model
         }
     }
 
+    public function getPrincipalSign(){
+        if(!empty($this->principal_signature) && file_exists('upload/setting/'.$this->principal_signature)) 
+        {
+            return url('upload/setting/'.$this->principal_signature);
+        }
+        else
+        {
+            return '';
+        }
+    }
+
 }

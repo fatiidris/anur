@@ -12,6 +12,18 @@ class MarksRegisterModel extends Model
 
     protected $table = 'mark_register';
 
+     protected $fillable = [
+        'student_id',
+        'subject_id',
+        'exam_id',
+        'class_id',
+        'ca1',
+        'ca2',
+        'ca3',
+        'exam',
+        'teacher_id'
+    ];
+
     /** Check if mark already exists */
     public static function CheckAlreadyMark($student_id, $exam_id, $class_id, $subject_id)
     {

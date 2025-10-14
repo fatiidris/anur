@@ -802,13 +802,15 @@ public function saveReportRemark(Request $request)
 
 public function marksRegisterSubjectTeacher(Request $request)
 {
-    $teacher_id = Auth::id();
+ $teacher_id = Auth::id();
 
-    $getExam = ExamModel::where('is_delete', 0)
+    // ✅ Get all exams (not deleted)
+    $data['getExam'] = ExamModel::where('is_delete', 0)
         ->select('id as exam_id', 'name as exam_name')
         ->get();
 
-    $getClass = AssignSubjectTeacherModel::where('teacher_id', $teacher_id)
+    // ✅ Get all classes this teacher is assigned to
+    $data['getClass'] = AssignSubjectTeacherModel::where('teacher_id', $teacher_id)
         ->where('is_delete', 0)
         ->with('class')
         ->get()
@@ -817,13 +819,34 @@ public function marksRegisterSubjectTeacher(Request $request)
         ->unique('id')
         ->values();
 
-    $getSubject = collect();
-    $getStudent = collect();
+    // Empty defaults
+    $data['getSubject'] = collect();
+    $data['getStudent'] = collect();
 
-    return view('teacher.marks_register', compact(
-        'getExam', 'getClass', 'getSubject', 'getStudent'
-    ));
+    // ✅ Only proceed if teacher selected both exam + class
+    if ($request->filled('exam_id') && $request->filled('class_id')) {
+        // Fetch all subjects scheduled for that exam & class
+        $allSubjects = ExamScheduleModel::getSubject(
+            $request->get('exam_id'),
+            $request->get('class_id')
+        );
+
+        // ✅ Filter only subjects assigned to this teacher
+        $data['getSubject'] = $allSubjects->filter(function ($subj) use ($teacher_id) {
+            return AssignSubjectTeacherModel::where('teacher_id', $teacher_id)
+                ->where('class_id', $subj->class_id)
+                ->where('subject_id', $subj->subject_id)
+                ->where('is_delete', 0)
+                ->exists();
+        });
+
+        // ✅ Fetch students of this class
+        $data['getStudent'] = User::getStudentClass($request->get('class_id'));
+    }
+
+    return view('teacher.mark_register_subject_teacher', $data);
 }
+
 
 public function submitMarksRegister(Request $request)
 {
@@ -943,11 +966,8 @@ public function ParentMyExamResult(Request $request, $student_id)
 
     // All the children for this parent
     $students = User::where('parent_id', $parentId)->get();
+    $exams = ExamModel::all(); // or filter
 
-    // All the exams you want to display
-    $exams = ExamModel::all();   // or your own filtering
-
-    // ─── If NO exam_id is supplied, just show the list page with print links ───
     if (!$request->has('exam_id')) {
         return view('parent.my_exam_result_index', [
             'students' => $students,
@@ -955,18 +975,15 @@ public function ParentMyExamResult(Request $request, $student_id)
         ]);
     }
 
-    // ─── If exam_id IS supplied, build the printable result ───
-    $exam_id = $request->query('exam_id');   // from ?exam_id=...
-    // student_id comes from the route parameter
+    $exam_id = $request->query('exam_id');
 
-    // Guard against missing params
     if (!$exam_id || !$student_id) {
         return back()->with('error', 'Missing exam_id or student_id.');
     }
 
     // ===== Basic data =====
-    $data['students'] = $students; // still pass to view if you need links again
-    $data['exams']    = $exams;
+    $data['students']   = $students;
+    $data['exams']      = $exams;
     $data['getExam']    = ExamModel::getSingle($exam_id);
     $data['getStudent'] = User::getSingle($student_id);
     $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
@@ -990,7 +1007,15 @@ public function ParentMyExamResult(Request $request, $student_id)
             'passing_mark' => $exam['passing_mark'],
         ];
     }
-    $data['getExamMarks'] = $dataSubject;
+
+    // ===== Match Blade expectation ($getRecord) =====
+    $data['getRecord'] = [
+        [
+            'exam_id'   => $exam_id,
+            'exam_name' => $data['getExam']->name ?? 'Exam',
+            'subject'   => $dataSubject,
+        ]
+    ];
 
     // ===== Remarks =====
     $remark = StudentReportRemark::where('student_id', $student_id)
@@ -1006,7 +1031,7 @@ public function ParentMyExamResult(Request $request, $student_id)
 
     $data['header_title'] = "My Exam Result";
 
-    // Render the printable single-result view
+    
     return view('parent.my_exam_result', $data);
 }
 

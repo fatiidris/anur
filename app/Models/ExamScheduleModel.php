@@ -71,6 +71,11 @@ class ExamScheduleModel extends Model
                         ->get();
         }
 
+        public function subject()
+        {
+            return $this->belongsTo(SubjectModel::class, 'subject_id');
+        }
+
 
     static public function getExamTimetable($exam_id, $class_id)
         {
