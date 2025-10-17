@@ -9,16 +9,16 @@
     <div class="footer-row">
         <h2>Quick Links</h2>
       <ul>          
-        <li class="current"><a href="./index.html">Home</a></li>
-        <li><a href="./about.html">About Us</a></li>
-        <li><a href="./Admission.html">Admission</a></li>
-            <li><a href="./contact.html">Contact</a></li>
+        <li class="current"><a href="{{ route('home') }}">Home</a></li>
+        <li><a href="{{ route('about') }}">About Us</a></li>
+        <li><a href="{{ route('admission') }}">Admission</a></li>
+            <li><a href="{{ route('contact') }}">Contact</a></li>
             <div class="dropdown2">
                 <li><a href="#">More<span><i class="fa-solid fa-angle-down"></i></span></a></li>
                 <div class="dropdown2-content">
-                <li><a href="./updates.html">Upades</a></li>
+                <li><a href="{{ route('updates') }}">Upades</a></li>
                 <!-- <li><a href="#department">Academics</a></li> -->
-                <li><a href="./results.html">Results</a></li>
+                <li><a href="{{ route('results') }}">Results</a></li>
                 </div>
                 </div>
       </ul>

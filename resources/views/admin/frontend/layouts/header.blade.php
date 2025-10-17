@@ -18,9 +18,10 @@
                 <p>Model School</p>
             </div>
             </label>
-            <div class="nav-links" Id="checkmenu">
+          
+                 <div class="nav-links" Id="checkmenu">
                 <ul>
-                    <i class="fa fa-times" onclick ="hideMenu()"></i>          
+                <i class="fa fa-times" onclick ="hideMenu()"></i>          
                 <li class="current"><a href="{{ route('home') }}">Home</a></li>
                 <li><a href="{{ route('about') }}">About Us</a></li>
                 <li><a href="{{ route('admission') }}">Admission</a></li>
@@ -28,7 +29,7 @@
                     <div class="dropdown2">
                         <li><a href="#">More<span><i class="fa-solid fa-angle-down"></i></span></a></li>
                         <div class="dropdown2-content">
-                        <li><a href="{{ route('updates') }}">Updates</a></li>
+                        <li><a href="{{ route('updates') }}">Upades</a></li>
                         <!-- <li><a href="#department">Academics</a></li> -->
                         <li><a href="{{ route('results') }}">Results</a></li>
                         <li><a href="{{ route('login') }}">Login</a></li>

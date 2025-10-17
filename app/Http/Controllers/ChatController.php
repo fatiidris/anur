@@ -24,10 +24,14 @@ class ChatController extends Controller
             }
             
             ChatModel::UpdateCount($sender_id, $receiver_id);
+            $data['receiver_id'] = $receiver_id;
             $data['getReceiver'] = User::getSingle($receiver_id);
             $data['getChat'] = ChatModel::getChat($receiver_id, $sender_id);  
         }
-
+        else
+        {
+            $data['receiver_id'] = "";
+        }
         $data['getChatUser'] = ChatModel::getChatUser($sender_id);
         
 
@@ -59,13 +63,19 @@ public function submit_message(Request $request)
         $receiver_id = $request->receiver_id;
         $sender_id = Auth::user()->id;
 
+        ChatModel::updateCount($receiver_id, $sender_id);
+
         $data['getChat'] = ChatModel::getChat($receiver_id, $sender_id);
         $data['getReceiver'] = User::getSingle($receiver_id);
         $data['sender_id'] = $sender_id;
 
         return response()->json([
             "status" => true,
-            "success" => view('chat._single', $data)->render(),
+            "receiver_id" => base64_encode($receiver_id),
+            "success" => view('chat._message', [
+                "getReceiver" => $getReceiver,
+                "getChat" => $getChat,
+            ])->render(),
         ], 200);
     }
 }

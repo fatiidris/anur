@@ -87,24 +87,28 @@ class FrontendSettingController extends Controller
             'carousel_image_4' => 'carousel_image_4',
         ];
         
-        $uploadDirectory = 'public/frontend/Img/';
+        $uploadDirectory = 'frontend/Img/';
 
-foreach ($imageFields as $modelProperty => $inputName) {
-    if (!empty($request->file($inputName))) {
-        // Delete old image if it exists
-        if (!empty($setting->$modelProperty) && File::exists(public_path($uploadDirectory . $setting->$modelProperty))) {
-            File::delete(public_path($uploadDirectory . $setting->$modelProperty));
+        foreach ($imageFields as $modelProperty => $inputName) {
+            if (!empty($request->file($inputName))) {
+                if (!empty($setting->$modelProperty) && File::exists(public_path($uploadDirectory . $setting->$modelProperty))) {
+                    File::delete(public_path($uploadDirectory . $setting->$modelProperty));
+                }
+
+                if (!File::exists(public_path($uploadDirectory))) {
+                    File::makeDirectory(public_path($uploadDirectory), 0755, true);
+                }
+
+                $file = $request->file($inputName);
+                $ext = $file->getClientOriginalExtension();
+                $randomStr = date('Ymdhis') . Str::random(10);
+                $filename = strtolower($randomStr) . '.' . $ext;
+
+                $file->move(public_path($uploadDirectory), $filename);
+                $setting->$modelProperty = $filename;
+            }
         }
-        
-        $file = $request->file($inputName);
-        $ext = $file->getClientOriginalExtension();
-        $randomStr = date('Ymdhis').Str::random(10);
-        $filename = strtolower($randomStr).'.'.$ext;
-        
-        $file->move(public_path($uploadDirectory), $filename);
-        $setting->$modelProperty = $filename;
-    }
-}
+
 
         
         // ---------------------------------------------------------------------

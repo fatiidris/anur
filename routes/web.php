@@ -63,6 +63,7 @@ Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/about', [FrontendController::class, 'about'])->name('about');
 Route::get('/admission', [FrontendController::class, 'admission'])->name('admission');
 Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
+Route::post('/contact', [FrontendController::class, 'sendContactEmail'])->name('contact.send');
 Route::get('/updates', [FrontendController::class, 'updates'])->name('updates');
 Route::get('/results', [FrontendController::class, 'results'])->name('results');
 

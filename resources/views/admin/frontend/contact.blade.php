@@ -1,11 +1,12 @@
 @extends('admin.frontend.layouts.layout')
 
 @section('content')
-<div class="container">
-        <!-------- about us content -------->
-    <section class="sub-header">
+<section class="sub-header">
         <h1>Contact</h1>
     </section>
+<div class="container">
+    <div class="page-content">
+
 <!-------- contact us -------->
     <section class="locaton">
         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2018062.5377754625!2d7.476777661004616!3d8.923358659835968!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0baf7da48d0d%3A0x99a8fe4168c50bc8!2sNigeria!5e0!3m2!1sen!2sng!4v1645451390224!5m2!1sen!2sng" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
@@ -41,7 +42,7 @@
             </div>
             <div class= "contact-col">
 
-                <form action="form-handler.php" method="post">
+                <form action="/form-handler.php" method="post">
                     <input type="text" name="name" placeholder="Enter your name" required>
                     <input type="email" name="email" placeholder="Enter email address" required>
                     <input type="text" name="subject" placeholder="Enter your subject" required>
@@ -51,6 +52,18 @@
             </div>
         </div>
     </section>
-
+  </div>
 </div>
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const name = document.querySelector('input[name="name"]');
+        const email = document.querySelector('input[name="email"]');
+        const message = document.querySelector('textarea[name="message"]');
+
+        if (!name.value || !email.value || !message.value) {
+            alert('Please fill out all required fields.');
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+</script>
 @endsection

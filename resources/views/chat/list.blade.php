@@ -301,7 +301,7 @@
                 @include('chat._user')      
                 </ul>
             </div>
-            <div class="chat">
+            <div class="chat" id="getChatMessageAll">
                 @if(!empty($getReceiver))
                     @include('chat._message')
                 @else
@@ -318,6 +318,33 @@
 
 @section('script')
   <script type="text/javascript">
+
+    $('body').on(.'getChatWindows', 'click', function(e) {
+        e.preventDefault();
+        var receiver_id = $(this).attr('id');
+        $('.getChatWindows').removeClass('active');
+        $(this).addClass('active');
+        $.ajax({
+            type: 'POST',
+            url: "{{ url('get_chat_windows') }}",
+            data: {
+                'receiver_id':receiver_id,
+                '_token': "{{ csrf_token() }}"
+            },
+            dataType: 'json',
+            success: function(data) {
+                $('#ClearMessage'+receiver_id).hide();
+                $('#getChatMessageAll').html(data.success);
+                window.history.pushState("", "", "{{ url('chat?receiver_id=')}}"+data.receiver_id);
+                scrolldown();
+                },    
+            
+            error: function(data) {
+            
+            },
+        });
+    });
+
     $('body').on('submit', '#submit_message', function(e) {
         e.preventDefault();
 
