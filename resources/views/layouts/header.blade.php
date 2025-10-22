@@ -376,6 +376,12 @@
                   <p>FrontEnd Setting</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{ url ('admin/frontend/updates-setting') }}" class="nav-link @if(Request::segment(2) == 'frontend-settings') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Update Settings</p>
+                </a>
+              </li>
             </ul>
           </li>
 

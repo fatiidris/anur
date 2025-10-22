@@ -20,7 +20,7 @@
         </div>
 
         <!-- Updates Gallery -->
-        <div class="gallery" style="margin-bottom: 15px;">
+        <div class="gallery">
             <img src="{{ url('public/frontend/Img/image1.jpg') }}" alt="Cultural Day Celebration">
             <img src="{{ url('public/frontend/Img/image2.jpg') }}" alt="Science Exhibition Day">
             <img src="{{ url('public/frontend/Img/image3.jpg') }}" alt="Students on Excursion Trip">
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Second Gallery Section -->
-        <div class="gallery" style="margin-bottom: 15px;">
+        <div class="gallery">
             <img src="{{ url('public/frontend/Img/image1.jpg') }}" alt="Classroom Innovation">
             <img src="{{ url('public/frontend/Img/image2.jpg') }}" alt="Staff Development Workshop">
             <img src="{{ url('public/frontend/Img/image3.jpg') }}" alt="Sports Day Event">

@@ -137,4 +137,5 @@ class FrontendSettingModel extends Model
             return '';
         }
     }
+
 }

@@ -14,6 +14,7 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{{ url('public/css/custom.css') }}">
+  <link rel="stylesheet" href="{{ url('public/css/style.css') }}">
 
   <!-- Font Awesome (CDN, for latest icons) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

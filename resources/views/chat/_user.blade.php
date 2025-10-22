@@ -1,6 +1,6 @@
 @foreach($getChatUser as $user)
     <li class="clearfix getChatWindows" @if(!empty($receiver_id)) @if($receiver_id == $user['user_id]) active @endif @endif id="{{ $user['user_id'] }}">
-      <a href="{{ url('chat?receiver_id='.base64_encode($user['user_id'])) }}">
+
         <img src="{{ $user['profile_pic'] }}" style="height: 45px;" alt="avatar">
         <div class="about">
         <div class="name">{{ $user['name'] }} 
@@ -10,8 +10,7 @@
             </div>
             <div class="status"> <i class="fa fa-circle offline"></i>{{ Carbon\Carbon::parse($user['created_date'])->diffForHumans() }}</div>                                            
         </div>
-        
-     </a> 
+
     </li>
 @endforeach
 

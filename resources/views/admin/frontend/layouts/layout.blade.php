@@ -11,7 +11,9 @@
   @php
     $getHeaderSetting = App\Models\SettingModel::getSingle();
   @endphp
-<link href="{{ $getHeaderSetting->getFevicon() }}" rel="icon" type="image/jpg" />
+  @if($getHeaderSetting && $getHeaderSetting->getFevicon())
+      <link href="{{ $getHeaderSetting->getFevicon() }}" rel="icon" type="image/jpg" />
+  @endif
   </head>
   <body>
     <body id="top">

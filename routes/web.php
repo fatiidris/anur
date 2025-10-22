@@ -81,6 +81,8 @@ Route::group(['middleware' => 'common'], function(){
     Route::get('chat', [ChatController::class, 'chat']);
     Route::post('submit_message', [ChatController::class, 'submit_message']);
     Route::post('get_chat_windows', [ChatController::class, 'get_chat_windows']);
+    Route::post('get_chat_search_user', [ChatController::class, 'get_chat_search_user']);
+    
 });
 
 
@@ -267,11 +269,13 @@ Route::group(['middleware' => 'admin'], function(){
     Route::post('admin/fees_collection/add_collect_fees/{student_id}', [FeesCollectionController::class, 'collect_fees_insert']);
 
     // frontend settings
-   Route::get('admin/frontend-settings', [FrontendSettingController::class, 'FrontSetting']);
-//    Route::post('admin/front/setting/update', [FrontendSettingController::class, 'UpdateFrontSetting']);
+      Route::get('admin/frontend-settings', [FrontendSettingController::class, 'FrontSetting']);
       Route::post('admin/frontend-settings', [FrontendSettingController::class, 'UpdateFrontSetting'])
     ->name('admin.frontend-settings.update');  
     }); 
+    Route::get('admin/frontend/updates-setting', [FrontendSettingController::class, 'UpdatesSetting']);
+    Route::post('admin/frontend/updates-setting/update', [FrontendSettingController::class, 'updateUpdatesSetting']);
+
 
     Route::group(['middleware' => 'teacher'], function(){
     Route::get('teacher/dashboard', [DashboardController::class, 'dashboard']);

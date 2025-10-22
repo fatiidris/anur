@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\FrontendSettingModel;
+use App\Models\UpdatesSettingModel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
@@ -117,5 +118,42 @@ class FrontendSettingController extends Controller
         // dd($setting->getAttributes());
         $setting->save();
         return redirect()->back()->with('success', "Frontend Setting Successfully Updated");
+    }
+
+    public function UpdatesSetting()
+    {
+        // Fetch the first record (or empty if none exists yet)
+        $setting = UpdatesSettingModel::first() ?? new UpdatesSettingModel();
+
+        // Return your view (adjust the blade name if different)
+        return view('admin.frontend.frontend_setting.update_setting', compact('setting'));
+    }
+
+    public function updateUpdatesSetting(Request $request)
+    {
+        // ✅ always use the first record (or create new)
+        $setting = UpdatesSettingModel::first() ?? new UpdatesSettingModel();
+
+        // Text fields
+        $setting->update_intro_title = $request->update_intro_title;
+        $setting->update_intro_description = $request->update_intro_description;
+        $setting->update_middle_title = $request->update_middle_title;
+        $setting->update_middle_description = $request->update_middle_description;
+        $setting->update_footer_title = $request->update_footer_title;
+        $setting->update_footer_description = $request->update_footer_description;
+
+        // Image uploads
+        for ($i = 1; $i <= 10; $i++) {
+            $field = 'update_gallery_image_' . $i;
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $filename = time() . '_' . $i . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('frontend/Img'), $filename);
+                $setting->$field = $filename;
+            }
+        }
+        // dd($request->all());
+        $setting->save();
+        return redirect()->back()->with('success', 'Updates Page Settings Saved Successfully!');
     }
 }
