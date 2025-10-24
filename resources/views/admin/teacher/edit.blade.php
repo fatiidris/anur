@@ -47,15 +47,14 @@
                   
                   <div class="form-group col-md-6">
                     <label>Gender<span style="color: red;">*</span></label>
-                    <select name="" class="form-control" required name="gender">
+                    <select class="form-control" required name="gender">
                       <option value="">Select Gender</option>
-                      <option {{ (old('gender', $getRecord->gender) == 'Male') ? 'selected' : '' }} value="Male">Male</option>
-                      <option {{ (old('gender', $getRecord->gender) == 'Female') ? 'selected' : '' }} value="Female">Female</option>
-                      <option {{ (old('gender', $getRecord->gender) == 'Other') ? 'selected' : '' }} value="Other">Other</option>
+                      <option {{ (old( 'gender' , $getRecord->gender ) == 'Male') ? 'selected' : '' }} value="Male">Male</option>
+                      <option {{ (old( 'gender' , $getRecord->gender ) == 'Female') ? 'selected' : '' }} value="Female">Female</option>
+                      <option {{ (old( 'gender' , $getRecord->gender ) == 'Other') ? 'selected' : '' }} value="Other">Other</option>
                     </select>
                     <div style="color: red"> {{ $errors->first('gender')}} </div>
                   </div>
-
                   <div class="form-group col-md-6">
                     <label>Mobile Number<span style="color: red;"></span></label>
                     <input type="text" class="form-control" name="mobile_number" value="{{ old('mobile_number', $getRecord->mobile_number)}}" placeholder="Mobile Number">

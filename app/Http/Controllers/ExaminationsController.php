@@ -961,78 +961,80 @@ public function singleSubmitMarksRegister(Request $request)
     }
 
 public function ParentMyExamResult(Request $request, $student_id)
-{
-    $parentId = Auth::id();
+    {
+        $parentId = Auth::id();
 
-    // All the children for this parent
-    $students = User::where('parent_id', $parentId)->get();
-    $exams = ExamModel::all(); // or filter
+        // All the children for this parent
+        $students = User::where('parent_id', $parentId)->get();
+        $exams   = ExamModel::all(); // or filter
 
-    if (!$request->has('exam_id')) {
-        return view('parent.my_exam_result_index', [
-            'students' => $students,
-            'exams'    => $exams,
-        ]);
-    }
+        if (!$request->has('exam_id')) {
+            return view('parent.my_student', [
+                'students' => $students,
+                'exams'    => $exams,
+            ]);
+        }
 
-    $exam_id = $request->query('exam_id');
+        $exam_id = $request->query('exam_id');
 
-    if (!$exam_id || !$student_id) {
-        return back()->with('error', 'Missing exam_id or student_id.');
-    }
+        if (!$exam_id || !$student_id) {
+            return back()->with('error', 'Missing exam_id or student_id.');
+        }
 
-    // ===== Basic data =====
-    $data['students']   = $students;
-    $data['exams']      = $exams;
-    $data['getExam']    = ExamModel::getSingle($exam_id);
-    $data['getStudent'] = User::getSingle($student_id);
-    $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
-    $data['getSetting'] = SettingModel::getSingle();
+        // ===== Basic data =====
+        $data['students']   = $students;
+        $data['exams']      = $exams;
+        $data['getExam']    = ExamModel::getSingle($exam_id);
+        $data['getStudent'] = User::getSingle($student_id);
+        $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
+        $data['getSetting'] = SettingModel::getSingle();
 
-    // ===== Exam subjects and scores =====
-    $getExamSubject = MarksRegisterModel::getExamSubject($exam_id, $student_id);
-    $dataSubject = [];
-    foreach ($getExamSubject as $exam) {
-        $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
-        $dataSubject[] = [
-            'subject_id'   => $exam['subject_id'],
-            'exam_id'      => $exam['exam_id'],
-            'subject_name' => $exam['subject_name'],
-            'ca1'          => $exam['ca1'],
-            'ca2'          => $exam['ca2'],
-            'ca3'          => $exam['ca3'],
-            'exam'         => $exam['exam'],
-            'total_score'  => $total_score,
-            'full_marks'   => $exam['full_marks'],
-            'passing_mark' => $exam['passing_mark'],
+        // ✅ SAFELY wrap getExam into a real object (so skill/behaviour loads properly)
+        $currentExam = $data['getExam'] ?? null;
+
+        // ===== Exam subjects and scores =====
+        $getExamSubject = MarksRegisterModel::getExamSubject($exam_id, $student_id);
+        $dataSubject = [];
+        foreach ($getExamSubject as $exam) {
+            $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
+            $dataSubject[] = [
+                'subject_id'   => $exam['subject_id'],
+                'exam_id'      => $exam['exam_id'],
+                'subject_name' => $exam['subject_name'],
+                'ca1'          => $exam['ca1'],
+                'ca2'          => $exam['ca2'],
+                'ca3'          => $exam['ca3'],
+                'exam'         => $exam['exam'],
+                'total_score'  => $total_score,
+                'full_marks'   => $exam['full_marks'],
+                'passing_mark' => $exam['passing_mark'],
+            ];
+        }
+
+        // ===== Match Blade expectation ($getRecord) =====
+        $data['getRecord'] = [
+            [
+                'exam_id'   => $exam_id,
+                'exam_name' => $currentExam->name ?? 'Exam',
+                'subject'   => $dataSubject,
+            ]
         ];
+
+        // ===== Remarks =====
+        $remark = StudentReportRemark::where('student_id', $student_id)
+            ->where('class_id', $data['getStudent']->class_id)
+            ->where('term_id',  $currentExam->term_id ?? 0)
+            ->where('session_id', $currentExam->session_id ?? 0)
+            ->first();
+
+        $data['skills']            = $remark?->skills ?? [];
+        $data['behaviour']         = $remark?->behaviour ?? [];
+        $data['teachers_comment']  = $remark?->teachers_comment ?? '';
+        $data['principal_comment'] = $remark?->principal_comment ?? '';
+
+        $data['header_title'] = "My Exam Result";
+
+        return view('parent.my_exam_result', $data);
     }
-
-    // ===== Match Blade expectation ($getRecord) =====
-    $data['getRecord'] = [
-        [
-            'exam_id'   => $exam_id,
-            'exam_name' => $data['getExam']->name ?? 'Exam',
-            'subject'   => $dataSubject,
-        ]
-    ];
-
-    // ===== Remarks =====
-    $remark = StudentReportRemark::where('student_id', $student_id)
-        ->where('class_id', $data['getStudent']->class_id)
-        ->where('term_id',  $data['getExam']->term_id ?? 0)
-        ->where('session_id', $data['getExam']->session_id ?? 0)
-        ->first();
-
-    $data['skills']            = $remark?->skills ?? [];
-    $data['behaviour']         = $remark?->behaviour ?? [];
-    $data['teachers_comment']  = $remark?->teachers_comment ?? '';
-    $data['principal_comment'] = $remark?->principal_comment ?? '';
-
-    $data['header_title'] = "My Exam Result";
-
-    
-    return view('parent.my_exam_result', $data);
-}
 
 }

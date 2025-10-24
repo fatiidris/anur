@@ -117,9 +117,12 @@
         
         </div>
 
-      </div><!-- /.container-fluid -->
+      </div>
     </section>
-    <!-- /.content -->
   </div>
-  <!-- /.content-wrapper -->
+  <style>
+    table, tr, td, th {
+    border: none;
+ }
+</style>
   @endsection

@@ -105,6 +105,10 @@
       </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+</div>
+<style>
+    table, tr, td, th {
+    border: none;
+}
+</style>
   @endsection

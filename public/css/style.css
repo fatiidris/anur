@@ -12,12 +12,10 @@ body {
 /* Table Styling */
 table {
     width: 100%;
-    border-collapse: collapse;
+border:none;
+justify-content: space-between;
 }
 
-table, tr, td, th {
-    border: 1px solid black;
-}
 
 td, th {
     padding: 6px;
@@ -34,7 +32,7 @@ td, th {
 .passport {
     width: 100px;
     height: 100px;
-    border: 1px solid black;
+    border: none;
 }
 
 #logo {
@@ -63,7 +61,7 @@ td, th {
 .sign {
     width: 300px;
     height: 80px;
-    border: 1px solid black;
+    border: none;
 }
 
 /* Utility Classes */
@@ -72,18 +70,17 @@ td, th {
 }
 
 .table-bg {
-    border-collapse: collapse;
     width: 100%;
     font-size: 15px;
 }
 
 .th {
-    border: 1px solid #000;
+    border:none;
     padding: 10px;
 }
 
 .td {
-    border: 1px solid #000;
+    border: none;
     padding: 3px;
 }
 

@@ -78,7 +78,7 @@
     <!-- Brand Logo -->
     <a href="javascript:;" class="brand-link" style="text-align: center;">
    @if(!empty($getHeaderSetting->getLogo()))
-      <img src="{{ $getHeaderSetting->getLogo() }}" style="width: auto;height: 60px;border-radius: 5px;" alt="">
+      <img src="{{ $getHeaderSetting->getLogo() }}" style="width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; border-radius:50%;">
    @else
       <span class="brand-text font-weight-light" style="font-weight: bold !important;font-size: 20px">School</span>
    @endif

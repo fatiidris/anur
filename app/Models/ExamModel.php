@@ -108,12 +108,13 @@ class ExamModel extends Model
      * Get all active exams (for dropdowns)
      */
     static public function getExam()
-    {
-        return self::with(['term', 'session'])
-                   ->where('is_delete', 0)
-                   ->orderBy('name', 'asc')
-                   ->get();
-    }
+{
+    return self::with(['term', 'session'])
+               ->where('is_delete', 0)
+               ->orderBy('id', 'desc') // get most recent exam
+               ->take(1)               // only 1 — the current/latest
+               ->get();
+}
 
     /**
      * Soft delete exam

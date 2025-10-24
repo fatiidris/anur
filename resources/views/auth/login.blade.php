@@ -25,11 +25,11 @@
      <div class="card-header text-center">
     @if(!empty($getHeaderSetting) && $getHeaderSetting->getLogo())
         <img src="{{ $getHeaderSetting->getLogo() }}" alt="School Logo" 
-             style="width: 150px; height: 90px; object-fit: contain; margin-bottom: 10px;">
+             style="width: 150px; height: 150px; object-fit: contain; margin-bottom: 10px; border-radius:50%;">
     @endif
     </div>
     <div class="card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+      <p class="login-box-msg">Welcome to An-nur Islamic School</p>
 
       @include('_message')
 

@@ -176,7 +176,7 @@
 
 .chat .chat-history .other-message:after {
     border-bottom-color: #e8f1f3;
-    left: 93%
+    left: 85%
 }
 
 .chat .chat-message {
@@ -319,31 +319,31 @@
 
 @section('script')
   <script type="text/javascript">
-$('body').delegate('.getChatWindows', 'click', function(e) {
-    e.preventDefault();
-    var receiver_id = $(this).attr('id');
-    $('#getReceiverIDDynamic').val(receiver_id);
-    $('.getChatWindows').removeClass('active');
-    $(this).addClass('active');
-    $.ajax({
-        type: 'POST',
-        url: "{{ url('get_chat_windows') }}",
-        data: {
-            'receiver_id': receiver_id,
-            '_token': "{{ csrf_token() }}"
-        },
-        dataType: 'json',
-        success: function(data) {
-            $('#ClearMessage' + receiver_id).hide();
-            $('#getChatMessageAll').html(data.success);
-            window.history.pushState("", "", "{{ url('chat?receiver_id=') }}"+data.receiver_id);
-            scrolldown();
-        },
-        error: function(data) {
+    $('body').delegate('.getChatWindows', 'click', function(e) {
+        e.preventDefault();
+        var receiver_id = $(this).attr('id');
+        $('#getReceiverIDDynamic').val(receiver_id);
+        $('.getChatWindows').removeClass('active');
+        $(this).addClass('active');
+        $.ajax({
+            type: 'POST',
+            url: "{{ url('get_chat_windows') }}",
+            data: {
+                'receiver_id': receiver_id,
+                '_token': "{{ csrf_token() }}"
+            },
+            dataType: 'json',
+            success: function(data) {
+                $('#ClearMessage' + receiver_id).hide();
+                $('#getChatMessageAll').html(data.success);
+                window.history.pushState("", "", "{{ url('chat?receiver_id=') }}"+data.receiver_id);
+                scrolldown();
+            },
+            error: function(data) {
 
-        },
+            },
+        });
     });
-});
 
     $('body').delegate('#getSearchUser', 'click', function(e){
         var search = $('#getSearch').val();
@@ -390,7 +390,7 @@ $('body').delegate('.getChatWindows', 'click', function(e) {
     });
     function scrolldown()
     {
-            $('.chat-history').animate({scrollTop: $('.chat-history').prop("scrollHeight")+1000}, 500);
+        $('.chat-history').animate({scrollTop: $('.chat-history').prop("scrollHeight")+1000}, 500);
     }
     scrolldown();
 

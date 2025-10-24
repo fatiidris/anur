@@ -200,7 +200,11 @@
         </div>
       </div><!-- /.container-fluid -->
     </section>
-    <!-- /.content -->
+    
   </div>
-  <!-- /.content-wrapper -->
+  <style>
+    table, tr, td, th {
+    border: none;
+ }
+</style>
   @endsection

@@ -108,5 +108,10 @@
     </section>
 
   </div>
+  <style>
+    table, tr, td, th {
+    border: none;
+}
+</style>
 
   @endsection

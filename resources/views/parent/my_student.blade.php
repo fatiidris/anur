@@ -48,6 +48,9 @@
                     </tr>
                   </thead>
                   <tbody>
+                    @php
+                        $getRecord = $getRecord ?? [];
+                    @endphp
                   @foreach($getRecord as $value)
                   <tr>
                     <td>
@@ -70,46 +73,16 @@
                     <td>{{ $value->weight }}</td>
                     <td>{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
                     <td style="min-width: 300px;">
-                        <a style="margin-bottom: 10px;" class="btn btn-success btn-sm" 
-                          href="{{ url('parent/my_student/subject/'.$value->id) }}" title="Subject">
-                          <i class="fas fa-book"></i>
-                        </a>
-
-                        <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" 
-                          href="{{ url('parent/my_student/exam_timetable/'.$value->id) }}" title="Exam Timetable">
-                          <i class="fas fa-calendar-alt"></i>
-                        </a>
-
-                        @foreach($exams as $exam)
-                            <a class="btn btn-primary btn-sm" target="_blank"
-                              href="{{ url('parent/my_exam_result/print?exam_id='.$exam->id.'&student_id='.$value->id) }}">
-                                <i class="fas fa-file-alt"></i> Print {{ $value->name }} – {{ $exam->name }}
-                            </a>
-                        @endforeach
-
-                        <a style="margin-bottom: 10px;" class="btn btn-warning btn-sm" 
-                          href="{{ url('parent/my_student/calender/'.$value->id) }}" title="Calendar">
-                          <i class="fas fa-calendar"></i>
-                        </a>
-                        <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" 
-                          href="{{ url('parent/my_student/attendance/'.$value->id) }}" title="Attendance">
-                          <i class="fas fa-user-check"></i>
-                        </a>
-                        <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" 
-                          href="{{ url('parent/my_student/homework/'.$value->id) }}" title="Homework">
-                          <i class="fas fa-tasks"></i>
-                        </a>
-                        <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" 
-                          href="{{ url('parent/my_student/submitted_homework/'.$value->id) }}" title="Submitted Homework">
-                          <i class="fas fa-check-circle"></i>
-                        </a>
-                        <a style="margin-bottom: 10px;" class="btn btn-success btn-sm" 
-                          href="{{ url('parent/my_student/fees_collection/'.$value->id) }}" title="Fees Collection">
-                          <i class="fas fa-money-bill-wave"></i>
-                        </a>
-
+                      <a style="margin-bottom: 10px;" class="btn btn-success btn-sm" href="{{url ('parent/my_student/subject/'.$value->id)}}">Subject</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" href="{{url ('parent/my_student/exam_timetable/'.$value->id)}}">Exam Timetable</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" href="{{url ('parent/my_student/exam_result/'.$value->id)}}">Exam Result</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-warning btn-sm" href="{{url ('parent/my_student/calender/'.$value->id)}}">Calender</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" href="{{url ('parent/my_student/attendance/'.$value->id)}}">Attendance</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" href="{{url ('parent/my_student/homework/'.$value->id)}}">HomeWork</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-primary btn-sm" href="{{url ('parent/my_student/submitted_homework/'.$value->id)}}">Submited HomeWork</a>
+                      <a style="margin-bottom: 10px;" class="btn btn-success btn-sm" href="{{url ('parent/my_student/fees_collection/'.$value->id)}}">Fees Collection</a>
                     </td>
-                </tr>
+                  </tr>
                   @endforeach
 
                   </tbody>
@@ -121,11 +94,10 @@
           </div>  
           
         </div>
-      </div><!-- /.container-fluid -->
+      </div>
     </section>
-    <!-- /.content -->
+    
   </div>
-  <!-- /.content-wrapper -->
-
   
+
   @endsection

@@ -47,7 +47,7 @@
                     <input type="file" class="form-control" name="logo">
                     <div style="color: red"> {{ $errors->first('logo')}} </div>
                     @if(!empty($getRecord->getLogo()))
-                    <img src="{{ $getRecord->getLogo() }}" style="width: auto;height: 50px;" alt="">
+                    <img src="{{ $getRecord->getLogo() }}" style="width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; border-radius:50%;">
                     @endif
                   </div>
 

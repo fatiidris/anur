@@ -171,7 +171,7 @@
       <td>{{ $ca3 }}</td>
       <td>{{ $examScore }}</td>
       <td>{{ $total }}</td>
-      @php
+@php
    $gradeLabel = '';
    $gradeColor = 'black';
 
