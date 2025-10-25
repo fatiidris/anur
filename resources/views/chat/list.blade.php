@@ -3,6 +3,12 @@
 @section('style')
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style type="text/css">
+
+    <link href="{{ url('public/emojionearea/emojionearea.min.css') }}" rel="stylesheet">
+
+    
+
+
 .card {
     background: #fff;
     transition: .5s;
@@ -318,7 +324,13 @@
 @endsection
 
 @section('script')
+
+<script src="{{ url('public/emojionearea/emojionearea.min.js') }}"></script>
+
   <script type="text/javascript">
+
+    $(".emojionearea").emojioneArea({});
+    
     $('body').delegate('.getChatWindows', 'click', function(e) {
         e.preventDefault();
         var receiver_id = $(this).attr('id');
@@ -380,6 +392,8 @@
             success: function(data) {
                     $('#AppendMessage').append(data.success);
                     $('#ClearMessage').val('');
+                    $('#file_name').val('');
+                    $('#getFileName').html('');
                     scrolldown();
                 
             },
@@ -393,6 +407,15 @@
         $('.chat-history').animate({scrollTop: $('.chat-history').prop("scrollHeight")+1000}, 500);
     }
     scrolldown();
+
+   $('body').delegate('#OpenFile', 'click', function(e) {
+    $('#file_name').trigger('click');
+    });
+
+    $('body').delegate('#file_name', 'change', function(e){
+        var filename = this.files[0].name;
+        $('#getFileName').html(filename);
+    });
 
   </script>
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 use Request;
+use Auth;
 
 class ChatModel extends Model
 {
@@ -110,4 +111,27 @@ class ChatModel extends Model
         ->where('status', '=', 0)->update(['status' => '1']);
     }
 
+    public function getFile()
+    {
+        if(!empty($this->file && file_exists('upload/chat/'.$this->file)))
+        {
+             return url('upload/chat/'.$this->file);
+        }
+         else
+        {
+            return "";
+        }
+    }
+   
+    static public function getAllChatUserCount()
+    {
+        $user_id = Auth::user()->id;
+        $return = self::select('chat.id')
+                ->join('users as sender', 'sender.id', '=', 'chat.sender_id')
+                ->join('users as receiver', 'receiver.id', '=', 'chat.receiver_id')
+                ->where('chat.receiver_id', '=', $user_id)
+                ->where('chat.status','=',0)
+                ->count();
+        return $return;     
+    }
 }
