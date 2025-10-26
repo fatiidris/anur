@@ -172,32 +172,25 @@
       <td>{{ $examScore }}</td>
       <td>{{ $total }}</td>
 @php
-   $gradeLabel = '';
-   $gradeColor = 'black';
+   $gradeLetter = '';
 
    if ($total >= 70) {
-       $gradeLabel = 'A - Distinction';
-       $gradeColor = 'green';
+       $gradeLetter = 'A';
    } elseif ($total >= 60) {
-       $gradeLabel = 'B - Very Good';
-       $gradeColor = 'blue';
+       $gradeLetter = 'B';
    } elseif ($total >= 50) {
-       $gradeLabel = 'C - Credit';
-       $gradeColor = '#006400'; // dark green
+       $gradeLetter = 'C';
    } elseif ($total >= 45) {
-       $gradeLabel = 'D - Pass';
-       $gradeColor = '#8B8000'; // golden brown
+       $gradeLetter = 'D';
    } elseif ($total >= 40) {
-       $gradeLabel = 'E - Fair';
-       $gradeColor = 'orange';
+       $gradeLetter = 'E';
    } else {
-       $gradeLabel = 'Fail';
-       $gradeColor = 'red';
+       $gradeLetter = 'Fail';
    }
 @endphp
 
-<td style="color: {{ $gradeColor }}; font-weight:bold;">
-   {{ $gradeLabel }}
+<td>
+   {{ $gradeLetter }}
 </td>
 
       <td>{{ $subjectPosition }}</td>

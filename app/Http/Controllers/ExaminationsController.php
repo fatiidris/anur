@@ -962,79 +962,71 @@ public function singleSubmitMarksRegister(Request $request)
 
 public function ParentMyExamResult(Request $request, $student_id)
     {
-        $parentId = Auth::id();
-
-        // All the children for this parent
-        $students = User::where('parent_id', $parentId)->get();
-        $exams   = ExamModel::all(); // or filter
-
-        if (!$request->has('exam_id')) {
-            return view('parent.my_student', [
-                'students' => $students,
-                'exams'    => $exams,
-            ]);
-        }
-
-        $exam_id = $request->query('exam_id');
-
-        if (!$exam_id || !$student_id) {
-            return back()->with('error', 'Missing exam_id or student_id.');
-        }
-
-        // ===== Basic data =====
-        $data['students']   = $students;
-        $data['exams']      = $exams;
-        $data['getExam']    = ExamModel::getSingle($exam_id);
+        // --- 1. Fetch Student Data ---
+        // This correctly fetches the student record and stores it in $data['getStudent']
         $data['getStudent'] = User::getSingle($student_id);
-        $data['getClass']   = MarksRegisterModel::getClass($exam_id, $student_id);
-        $data['getSetting'] = SettingModel::getSingle();
 
-        // ✅ SAFELY wrap getExam into a real object (so skill/behaviour loads properly)
-        $currentExam = $data['getExam'] ?? null;
+        // --- 2. Process Exam Records ---
+        $result = array();
+        $getExam = MarksRegisterModel::getExam($student_id);
 
-        // ===== Exam subjects and scores =====
-        $getExamSubject = MarksRegisterModel::getExamSubject($exam_id, $student_id);
-        $dataSubject = [];
-        foreach ($getExamSubject as $exam) {
-            $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
-            $dataSubject[] = [
-                'subject_id'   => $exam['subject_id'],
-                'exam_id'      => $exam['exam_id'],
-                'subject_name' => $exam['subject_name'],
-                'ca1'          => $exam['ca1'],
-                'ca2'          => $exam['ca2'],
-                'ca3'          => $exam['ca3'],
-                'exam'         => $exam['exam'],
-                'total_score'  => $total_score,
-                'full_marks'   => $exam['full_marks'],
-                'passing_mark' => $exam['passing_mark'],
-            ];
+        // Initialise variables for remarks lookup (based on the first exam found)
+        $classId = null;
+        $termId = null;
+        $sessionId = null;
+
+        foreach ($getExam as $value) {
+            $dataE = array();
+            $dataE['exam_id'] = $value->exam_id;
+            $dataE['exam_name'] = $value->exam_name;
+            $getExamSubject = MarksRegisterModel::getExamSubject($value->exam_id, $student_id);
+            
+            // Use class/term/session from the first exam record found for remarks lookup
+            if (!$classId && $getExamSubject->isNotEmpty()) {
+                $firstSubject = $getExamSubject->first();
+                $classId = $firstSubject->class_id ?? null;
+                $termId = $value->term_id ?? null; // Assuming getExam returns term_id/session_id
+                $sessionId = $value->session_id ?? null;
+            }
+
+            $dataSubject = array();
+            foreach ($getExamSubject as $exam) {
+                $total_score = $exam['ca1'] + $exam['ca2'] + $exam['ca3'] + $exam['exam'];
+                $dataS = array();
+                $dataS['subject_name'] = $exam['subject_name'];
+                $dataS['ca1'] = $exam['ca1'];
+                $dataS['ca2'] = $exam['ca2'];
+                $dataS['ca3'] = $exam['ca3'];
+                $dataS['exam'] = $exam['exam'];
+                $dataS['total_score'] = $total_score;
+                $dataS['full_marks'] = $exam['full_marks'];
+                $dataS['passing_mark'] = $exam['passing_mark'];
+                $dataSubject[] = $dataS;
+            }
+            $dataE['subject'] = $dataSubject;
+            $result[] = $dataE;
         }
-
-        // ===== Match Blade expectation ($getRecord) =====
-        $data['getRecord'] = [
-            [
-                'exam_id'   => $exam_id,
-                'exam_name' => $currentExam->name ?? 'Exam',
-                'subject'   => $dataSubject,
-            ]
-        ];
-
-        // ===== Remarks =====
-        $remark = StudentReportRemark::where('student_id', $student_id)
-            ->where('class_id', $data['getStudent']->class_id)
-            ->where('term_id',  $currentExam->term_id ?? 0)
-            ->where('session_id', $currentExam->session_id ?? 0)
-            ->first();
-
-        $data['skills']            = $remark?->skills ?? [];
-        $data['behaviour']         = $remark?->behaviour ?? [];
-        $data['teachers_comment']  = $remark?->teachers_comment ?? '';
-        $data['principal_comment'] = $remark?->principal_comment ?? '';
-
+        
+        // --- 3. Fetch Remarks Data ---
+        // Use the determined context (class/term/session) to fetch the remarks
+        // Note: You must ensure 'StudentReportRemark' model exists and the columns are correct.
+        $remarks = null;
+        if ($classId && $termId && $sessionId) {
+            $remarks = StudentReportRemark::where('student_id', $student_id)
+                ->where('class_id', $classId)
+                ->where('term_id', $termId)
+                ->where('session_id', $sessionId)
+                ->first();
+        }
+        
+        // --- 4. Prepare and Return Data ---
+        $data['getRecord'] = $result;
+        $data['studentRemarks'] = $remarks; // Pass the remarks to the view
         $data['header_title'] = "My Exam Result";
-
+        
+        // $data['getStudent'] was already set at the start, no need to re-declare the array.
+        
         return view('parent.my_exam_result', $data);
     }
-
+    
 }

@@ -40,7 +40,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @php
+                  @php
                     $total_score = 0;
                     $full_marks = 0;
                     $result_validation = 0; // 0 = pass, 1 = fail
@@ -48,7 +48,7 @@
                   @endphp
 
                   @foreach($value['subject'] ?? [] as $exam)
-                     @php
+                      @php
                         $total_score += $exam['total_score'];
                         $full_marks += $exam['full_marks'];
 
@@ -59,49 +59,52 @@
                         }
                       @endphp
                   <tr>
-                    <td style="width: 300px;">{{ $exam['subject_name']}}</td>
-                    <td>{{ $exam['ca1']}}</td>
-                    <td>{{ $exam['ca2']}}</td>
-                    <td>{{ $exam['ca3']}}</td>
-                    <td>{{ $exam['exam']}}</td>
-                    <td>{{ $exam['total_score']}}</td>
-                    <td>{{ $exam['passing_mark']}}</td>
-                    <td>{{ $exam['full_marks']}}</td>
-                    <td>
-                        @if($exam['total_score'] >= $exam['passing_mark'])
-                            <span style="color: green; font-weight: bold;">Pass</span>
-                        @else
-                        @php
-                          $result_validation = 1;
-                        @endphp
-                            <span style="color: red; font-weight: bold;">Fail</span>
-                        @endif
-                    </td>
-
+                      <td style="width: 300px;">{{ $exam['subject_name']}}</td>
+                      <td>{{ $exam['ca1']}}</td>
+                      <td>{{ $exam['ca2']}}</td>
+                      <td>{{ $exam['ca3']}}</td>
+                      <td>{{ $exam['exam']}}</td>
+                      <td>{{ $exam['total_score']}}</td>
+                      <td>{{ $exam['passing_mark']}}</td>
+                      <td>{{ $exam['full_marks']}}</td>
+                      <td>
+                          @if($exam['total_score'] >= $subjectPassMarkThreshold)
+                              <span style="color: green; font-weight: bold;">Pass</span>
+                          @else
+                              <span style="color: red; font-weight: bold;">Fail</span>
+                          @endif
+                      </td>
                   </tr>
-                  @endforeach  
+                  @endforeach
+
                   <tr>
-                    <td colspan="2">
-                      <b>Grand Total: {{ $total_score }}/{{ $full_marks }}</b>
-                    </td>
-                    <td colspan="2">
-                      @php
-                        $Percentage = ($total_score * 100)/ $full_marks;
-                        $getGrade = App\Models\MarksGradeModel::getGrade($Percentage);
-                      @endphp
-                      <b>Percentage: {{ round($Percentage, 2) }}%</b>
-                    </td>
-                    <td colspan="2">
-                      <b>Grade: {{ $getGrade }}</b>
-                    </td>
-                    <td colspan="3">
-                      <b>Result: @if($result_validation == 0) 
-                                    <span style="color: green;">Pass</span>
-                                  @else
-                                    <span style="color: red;">Fail</span>
-                                  @endif</b>
-                    </td>
-                  </tr>    
+                      <td colspan="2">
+                          <b>Grand Total: {{ $total_score }}/{{ $full_marks }}</b>
+                      </td>
+                      <td colspan="2">
+                          @php
+                            $Percentage = ($full_marks > 0) ? ($total_score * 100) / $full_marks : 0;
+                            $getGrade = App\Models\MarksGradeModel::getGrade($Percentage);
+
+                            // Fail automatically if no subjects
+                            if (!$hasSubjects) $result_validation = 1;
+                          @endphp
+                          <b>Percentage: {{ round($Percentage, 2) }}%</b>
+                      </td>
+                      <td colspan="2">
+                          <b>Grade: {{ $getGrade }}</b>
+                      </td>
+                      <td colspan="3">
+                          <b>Result: 
+                              @if($result_validation == 0)
+                                  <span style="color: green;">Pass</span>
+                              @else
+                                  <span style="color: red;">Fail</span>
+                              @endif
+                          </b>
+                      </td>
+                  </tr>
+    
                   </tbody>
                 </table>                     
                 </div>

@@ -1,13 +1,11 @@
 @extends('layouts.app')
 
 @section('style')
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <style type="text/css">
 
     <link href="{{ url('public/emojionearea/emojionearea.min.css') }}" rel="stylesheet">
-
-    
-
+    <link rel="stylesheet" href="{{ url('public/emojionearea/emojionearea.css') }}">
 
 .card {
     background: #fff;
@@ -326,6 +324,7 @@
 @section('script')
 
 <script src="{{ url('public/emojionearea/emojionearea.min.js') }}"></script>
+<script src="{{ url('public/emojionearea/emojionearea.js') }}"></script>
 
   <script type="text/javascript">
 

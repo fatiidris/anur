@@ -273,6 +273,7 @@ Route::group(['middleware' => 'admin'], function(){
       Route::post('admin/frontend-settings', [FrontendSettingController::class, 'UpdateFrontSetting'])
     ->name('admin.frontend-settings.update');  
     }); 
+    
     Route::get('admin/frontend/updates-setting', [FrontendSettingController::class, 'UpdatesSetting']);
     Route::post('admin/frontend/updates-setting/update', [FrontendSettingController::class, 'updateUpdatesSetting']);
 
@@ -374,6 +375,7 @@ Route::group(['middleware' => 'student'], function(){
     Route::get('parent/my_student/exam_result/{student_id}', [ExaminationsController::class, 'ParentMyExamResult']);
     Route::get('parent/my_exam_result/print', [ExaminationsController::class, 'MyExamResultPrint']);
     
+    
     Route::get('parent/my_student/calender/{student_id}', [CalenderController::class, 'MyCalenderParent']);
     
     Route::get('parent/my_student/attendance/{student_id}', [AttendanceController::class, 'MyAttendanceParent']);
@@ -389,8 +391,8 @@ Route::group(['middleware' => 'student'], function(){
     Route::post('parent/my_student/fees_collection/{student_id}', [FeesCollectionController::class, 'CollectFeesStudentPaymentParent']);
 
  // Parent Paystack callback routes
-Route::get('parent/paystack/payment-success/{student_id}', [FeesCollectionController::class, 'PaymentSuccessp'])->name('parent.paystack.success');
+    Route::get('parent/paystack/payment-success/{student_id}', [FeesCollectionController::class, 'PaymentSuccessp'])->name('parent.paystack.success');
 
-Route::get('parent/paystack/payment-error/{student_id}', [FeesCollectionController::class, 'PaymentErrorP'])->name('parent.paystack.error');
+    Route::get('parent/paystack/payment-error/{student_id}', [FeesCollectionController::class, 'PaymentErrorP'])->name('parent.paystack.error');
 
 });

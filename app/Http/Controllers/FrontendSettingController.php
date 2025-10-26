@@ -15,9 +15,7 @@ class FrontendSettingController extends Controller
      */
     public function FrontSetting()
 {
-    // The getSingle() method returns the first record or null.
-    // We use the null coalescing operator (??) to provide a new
-    // empty model instance if getSingle() returns null.
+   
     $data['getRecord'] = FrontendSettingModel::getSingle() ?? new FrontendSettingModel();
     $data['header_title'] = "Frontend Setting";
 
@@ -57,10 +55,6 @@ class FrontendSettingController extends Controller
         // Get the existing record or create a new model instance
         $setting = FrontendSettingModel::getSingle() ?? new FrontendSettingModel();
 
-        // ---------------------------------------------------------------------
-        // 1. FILL TEXT FIELDS
-        // ---------------------------------------------------------------------
-
         // Home/About/Contact text fields
         $setting->home_title = trim($request->input('home_title', ''));
         $setting->home_subtitle = trim($request->input('home_subtitle', ''));
@@ -74,10 +68,6 @@ class FrontendSettingController extends Controller
             $setting->{"carousel_text_$i"} = trim($request->input("carousel_text_$i", ''));
         }
 
-        // ---------------------------------------------------------------------
-        // 2. HANDLE IMAGE UPLOADS
-        // ---------------------------------------------------------------------
-
         // Array of image fields to process: Model Property Name => Input Field Name
         $imageFields = [
             'about_image' => 'about_image',
@@ -88,7 +78,7 @@ class FrontendSettingController extends Controller
             'carousel_image_4' => 'carousel_image_4',
         ];
         
-        $uploadDirectory = 'frontend/Img/';
+        $uploadDirectory = 'public/frontend/Img/';
 
         foreach ($imageFields as $modelProperty => $inputName) {
             if (!empty($request->file($inputName))) {
@@ -110,11 +100,6 @@ class FrontendSettingController extends Controller
             }
         }
 
-
-        
-        // ---------------------------------------------------------------------
-        // 3. SAVE
-        // ---------------------------------------------------------------------
         // dd($setting->getAttributes());
         $setting->save();
         return redirect()->back()->with('success', "Frontend Setting Successfully Updated");
@@ -148,7 +133,7 @@ class FrontendSettingController extends Controller
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
                 $filename = time() . '_' . $i . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('frontend/Img'), $filename);
+                $file->move(public_path('public/frontend/Img'), $filename);
                 $setting->$field = $filename;
             }
         }
