@@ -1,7 +1,6 @@
 @extends('admin.frontend.layouts.layout')
 
 @section('content')
-
 <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
 
     <div class="carousel-indicators">

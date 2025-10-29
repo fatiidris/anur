@@ -13,7 +13,7 @@ class FrontendSettingController extends Controller
     /**
      * Show the frontend settings page (admin).
      */
-    public function FrontSetting()
+public function FrontSetting()
 {
    
     $data['getRecord'] = FrontendSettingModel::getSingle() ?? new FrontendSettingModel();
@@ -40,7 +40,7 @@ class FrontendSettingController extends Controller
             'about_description' => $textRules,
             'about_image' => $imageRules,
             'contact_title' => $textRules,
-            'cntact_image' => $imageRules, // Note the spelling: 'cntact_image'
+             'contact_image' => $imageRules, // Note the spelling: 'cntact_image'
         ];
 
         // Add validation rules for the 4 carousel items dynamically
@@ -71,7 +71,7 @@ class FrontendSettingController extends Controller
         // Array of image fields to process: Model Property Name => Input Field Name
         $imageFields = [
             'about_image' => 'about_image',
-            'cntact_image' => 'cntact_image',
+            'contact_image' => 'contact_image',
             'carousel_image_1' => 'carousel_image_1',
             'carousel_image_2' => 'carousel_image_2',
             'carousel_image_3' => 'carousel_image_3',
@@ -108,7 +108,7 @@ class FrontendSettingController extends Controller
     public function UpdatesSetting()
     {
         // Fetch the first record (or empty if none exists yet)
-        $setting = UpdatesSettingModel::first() ?? new UpdatesSettingModel();
+          $setting = UpdatesSettingModel::first();
 
         // Return your view (adjust the blade name if different)
         return view('admin.frontend.frontend_setting.update_setting', compact('setting'));
@@ -133,7 +133,7 @@ class FrontendSettingController extends Controller
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
                 $filename = time() . '_' . $i . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('public/frontend/Img'), $filename);
+                $file->move(public_path('frontend/Img'), $filename);
                 $setting->$field = $filename;
             }
         }

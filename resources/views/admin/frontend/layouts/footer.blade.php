@@ -3,7 +3,7 @@
     <div class="footer-row">
         <h2>An-nur Model Islamic School</h2>
         <p>N0. 7 Brighter Road, Western Bye-pass, <br> Minna Niger State</p>
-        <p><span>Email:</span>annureduservices@gmail.com</p>
+        <p><span>Email:</span><a href="mailto:annureduservices@gmail.com">annureduservices@gmail.com</a></p>
         <p><span>Phone:</span>07038042711, 09019190684</p>
     </div>
     <div class="footer-row">

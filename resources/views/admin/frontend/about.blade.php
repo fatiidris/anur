@@ -48,25 +48,25 @@
         </section>
 
         <!-- ---------Sections--------- -->
-        <section class="classes">
+        <section class="values">
             <h1>Sections We Handle</h1>
             <p>We handle 3 sections which comprise the Nursery section, Primary section, and Secondary section.</p>
         </section>
 
-        <div class="classes-row">
-            <div class="classes-col">
+        <div class="values-row">
+            <div class="values-col">
                 <h3>Nursery Section</h3>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                     incididunt ut labore et dolore magna aliqua.</p>
             </div>
 
-            <div class="classes-col">
+            <div class="values-col">
                 <h3>Primary Section</h3>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                     incididunt ut labore et dolore magna aliqua.</p>
             </div>
 
-            <div class="classes-col">
+            <div class="values-col">
                 <h3>Secondary Section</h3>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                     incididunt ut labore et dolore magna aliqua.</p>
@@ -77,9 +77,22 @@
 
 <!-- ====== Styling for New Section ====== -->
 <style>
+    .about-col{
+         font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+    }
+    .about-col h1 {
+  padding-top: 0;
+  color: #003366;
+}
+.about-col p {
+  padding: 15px 0 25px;
+   color: #555;
+   font-size:20px;
+}
     .values {
         text-align: center;
         margin: 60px 0;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
     }
 
     .values h1 {
@@ -90,8 +103,8 @@
 
     .values p {
         color: #555;
-        font-size: 16px;
-        margin-bottom: 40px;
+        font-size: 20px;
+        /* margin-bottom: 40px; */
     }
 
     .values-row {
@@ -104,7 +117,7 @@
     .values-col {
         flex: 1 1 250px;
         background: #f9f9f9;
-        padding: 30px;
+        padding: 20px;
         border-radius: 15px;
         text-align: center;
         transition: 0.3s ease-in-out;
@@ -124,13 +137,14 @@
     }
 
     .values-col h3 {
-        font-size: 20px;
+        font-size: 23px;
         margin-bottom: 10px;
         color: #222;
+        font-style: bold;
     }
 
     .values-col p {
-        font-size: 15px;
+        font-size: 20px;
         color: #666;
     }
 
