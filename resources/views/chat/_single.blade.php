@@ -8,7 +8,8 @@
                 <img style="height: 40px;" src="{{ $value->getSender->getProfileDirect() }}" alt="avatar">
             </div>
             <div class="message other-message float-right">
-                {!! $value->message !!}
+                {!! nl2br($value->message) !!}
+
                 @if(!empty($value->getFile()))
             <div>
                 <a href="{{ $value->getFile() }}" download="" target="_blank">Attachment</a>
@@ -26,7 +27,7 @@
                 </span>
             </div>
          <div class="message my-message">
-            {!! $value->message !!}
+            {!! nl2br($value->message) !!}
              @if(!empty($value->getFile()))
             <div>
                 <a href="{{ $value->getFile() }}" download="" target="_blank">Attachment</a>

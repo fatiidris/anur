@@ -2,71 +2,63 @@
 
 @section('content')
 <section class="sub-header" style="margin-bottom: 20px;">
-    {{-- This title is static, as it's not in your settings blade --}}
-      <h1 style="margin: 0;">Our Updates</h1>
+    <h1 style="margin: 0;">Our Updates</h1>
 </section>
 
 <div class="container">
-        <div class="page-content">
+    <div class="page-content">
 
-              {{-- Use null-coalescing (??) to prevent errors if $setting is null --}}
-       <div class=gallery-description>
+        <!-- Introductory Write-up -->
+        <div class=gallery-description>
             <h2>
-              {{ $setting->update_intro_title ?? 'Capturing Our School Moments' }}
-           </h2>
+                Capturing Our School Moments
+            </h2>
             <p>
-              {{ $setting->update_intro_description ?? 'Take a look at some of our exciting events and memorable moments.' }}
+                Take a look at some of our exciting events and memorable moments.  
+                Each photo showcases our students’ creativity, dedication, and active participation in both academic and community activities.
             </p>
         </div>
 
-           <div class="gallery">
-            {{-- Loop through the first 5 gallery images --}}
-            @for ($i = 1; $i <= 5; $i++)
-                @php
-                    // Create the dynamic property name
-                    $imgKey = 'update_gallery_image_' . $i;
-                    // Get the image filename, or null if it doesn't exist
-                    $imgSrc = $setting->$imgKey ?? null;
-                @endphp
+        <!-- Updates Gallery -->
+        <div class="gallery">
+            <img src="{{ url('public/frontend/Img/image1.jpg') }}" alt="Cultural Day Celebration">
+            <img src="{{ url('public/frontend/Img/image2.jpg') }}" alt="Science Exhibition Day">
+            <img src="{{ url('public/frontend/Img/image3.jpg') }}" alt="Students on Excursion Trip">
+            <img src="{{ url('public/frontend/Img/image9.jpg') }}" alt="Graduation Ceremony Highlights">
+            <img src="{{ url('public/frontend/Img/image4.jpg') }}" alt="Community Outreach Programme">
+        </div>
 
-                {{-- Only display the image tag if the image source is not empty --}}
-                @if(!empty($imgSrc))
-                    <img src="{{ url('public/frontend/Img/' . $imgSrc) }}" alt="Gallery Image {{ $i }}">
-                @endif
-            @endfor
-            </div>
-
-             <div class="gallery-description">
+        <!-- Section Description Between Galleries -->
+        <div class="gallery-description">
             <h3>
-              {{ $setting->update_middle_title ?? 'Celebrating Achievements & Team Spirit' }}
-           </h3>
+                Celebrating Achievements & Team Spirit
+            </h3>
             <p>
-               {{ $setting->update_middle_description ?? 'These snapshots capture moments of learning, leadership, and fun.' }}
+                These snapshots capture moments of learning, leadership, and fun —  
+                from classroom innovations to extracurricular events that inspire collaboration and excellence.
             </p>
-           </div>
+        </div>
 
-           <div class="gallery">
-            {{-- Loop through the second set of 5 gallery images (6 to 10) --}}
-            @for ($i = 6; $i <= 10; $i++)
-                @php
-                    $imgKey = 'update_gallery_image_' . $i;
-                    $imgSrc = $setting->$imgKey ?? null;
-                @endphp
+        <!-- Second Gallery Section -->
+        <div class="gallery">
+            <img src="{{ url('public/frontend/Img/image1.jpg') }}" alt="Classroom Innovation">
+            <img src="{{ url('public/frontend/Img/image2.jpg') }}" alt="Staff Development Workshop">
+            <img src="{{ url('public/frontend/Img/image3.jpg') }}" alt="Sports Day Event">
+            <img src="{{ url('public/frontend/Img/image9.jpg') }}" alt="Award Presentation Ceremony">
+            <img src="{{ url('public/frontend/Img/image4.jpg') }}" alt="Environmental Awareness Campaign">
+        </div>
 
-                @if(!empty($imgSrc))
-                    <img src="{{ url('public/frontend/Img/' . $imgSrc) }}" alt="Gallery Image {{ $i }}">
-                @endif
-            @endfor
-           </div>
-
-     <div class="gallery-description">
-           <h3>
-               {{ $setting->update_footer_title ?? 'Our Journey Continues' }}
-           </h3>
-              <p>
-              {{ $setting->update_footer_description ?? 'We believe every event is an opportunity to learn and grow.' }}
+        <!-- Closing Write-up -->
+        <div class="gallery-description">
+            <h3>
+                Our Journey Continues
+            </h3>
+            <p>
+                We believe every event is an opportunity to learn and grow.  
+                Stay tuned as we keep sharing stories that reflect our values, achievements, and community impact.
             </p>
-       </div>
+        </div>
+
     </div>
 </div>
 
@@ -77,19 +69,19 @@ font-family:"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans
 padding:20px;
 }
 .gallery-description p{
-     font-size:20px;
+    font-size:20px;
 }
 
- @media screen and (min-width: 285px) and (max-width: 1000px){
-  .gallery {
-         flex-direction: column;
-   }
+  @media screen and (min-width: 285px) and (max-width: 1000px){
+    .gallery {
+          flex-direction: column;
+      }
 .gallery img {
       width: 100%;
       height: 100%;
       margin: 20px 0;
- }
-}
+  }
+  }
 </style>
 
 @endsection

@@ -26,89 +26,107 @@ public function FrontSetting()
      * Update or create the frontend setting.
      */
     public function UpdateFrontSetting(Request $request)
-    {
-        // Define common validation rules for text and image fields
-        $textRules = 'nullable|string';
-        $titleRules = 'nullable|string|max:255';
-        $imageRules = 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048';
+{
+    // dd($request->all());
+    // Define common validation rules for text and image fields
+    $textRules = 'nullable|string';
+    $titleRules = 'nullable|string|max:255';
+    $imageRules = 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048';
 
-        // Base validation rules
-        $rules = [
-            'home_title' => $titleRules,
-            'home_subtitle' => $titleRules,
-            'about_title' => $textRules,
-            'about_description' => $textRules,
-            'about_image' => $imageRules,
-            'contact_title' => $textRules,
-             'contact_image' => $imageRules, // Note the spelling: 'cntact_image'
-        ];
+    // Base validation rules
+    $rules = [
+        'home_title' => $titleRules,
+        'home_subtitle' => $titleRules,
+        'about_title' => $textRules,
+        'about_description' => $textRules,
+        'about_image' => $imageRules,
+        'contact_title' => $textRules,
+        'contact_image' => $imageRules, // Corrected your comment, code was fine
+    ];
 
-        // Add validation rules for the 4 carousel items dynamically
-        for ($i = 1; $i <= 4; $i++) {
-            $rules["carousel_title_$i"] = $titleRules;
-            $rules["carousel_text_$i"] = $textRules;
-            $rules["carousel_image_$i"] = $imageRules;
-        }
-
-        $request->validate($rules);
-
-        // Get the existing record or create a new model instance
-        $setting = FrontendSettingModel::getSingle() ?? new FrontendSettingModel();
-
-        // Home/About/Contact text fields
-        $setting->home_title = trim($request->input('home_title', ''));
-        $setting->home_subtitle = trim($request->input('home_subtitle', ''));
-        $setting->about_title = trim($request->input('about_title', ''));
-        $setting->about_description = trim($request->input('about_description', ''));
-        $setting->contact_title = trim($request->input('contact_title', ''));
-
-        // Carousel text fields (Loop 1-4)
-        for ($i = 1; $i <= 4; $i++) {
-            $setting->{"carousel_title_$i"} = trim($request->input("carousel_title_$i", ''));
-            $setting->{"carousel_text_$i"} = trim($request->input("carousel_text_$i", ''));
-        }
-
-        // Array of image fields to process: Model Property Name => Input Field Name
-        $imageFields = [
-            'about_image' => 'about_image',
-            'contact_image' => 'contact_image',
-            'carousel_image_1' => 'carousel_image_1',
-            'carousel_image_2' => 'carousel_image_2',
-            'carousel_image_3' => 'carousel_image_3',
-            'carousel_image_4' => 'carousel_image_4',
-        ];
-        
-        $uploadDirectory = 'public/frontend/Img/';
-
-        foreach ($imageFields as $modelProperty => $inputName) {
-            if (!empty($request->file($inputName))) {
-                if (!empty($setting->$modelProperty) && File::exists(public_path($uploadDirectory . $setting->$modelProperty))) {
-                    File::delete(public_path($uploadDirectory . $setting->$modelProperty));
-                }
-
-                if (!File::exists(public_path($uploadDirectory))) {
-                    File::makeDirectory(public_path($uploadDirectory), 0755, true);
-                }
-
-                $file = $request->file($inputName);
-                $ext = $file->getClientOriginalExtension();
-                $randomStr = date('Ymdhis') . Str::random(10);
-                $filename = strtolower($randomStr) . '.' . $ext;
-
-                $file->move(public_path($uploadDirectory), $filename);
-                $setting->$modelProperty = $filename;
-            }
-        }
-
-        // dd($setting->getAttributes());
-        $setting->save();
-        return redirect()->back()->with('success', "Frontend Setting Successfully Updated");
+    // Add validation rules for the 4 carousel items dynamically
+    for ($i = 1; $i <= 4; $i++) {
+        $rules["carousel_title_$i"] = $titleRules;
+        $rules["carousel_text_$i"] = $textRules;
+        $rules["carousel_image_$i"] = $imageRules;
     }
 
+    $request->validate($rules);
+
+    // Get the existing record or create a new model instance
+    $setting = FrontendSettingModel::getSingle() ?? new FrontendSettingModel();
+
+    // Home/About/Contact text fields
+    $setting->home_title = trim($request->input('home_title', ''));
+    $setting->home_subtitle = trim($request->input('home_subtitle', ''));
+    $setting->about_title = trim($request->input('about_title', ''));
+    $setting->about_description = trim($request->input('about_description', ''));
+    $setting->contact_title = trim($request->input('contact_title', ''));
+
+    // Carousel text fields (Loop 1-4)
+    for ($i = 1; $i <= 4; $i++) {
+        $setting->{"carousel_title_$i"} = trim($request->input("carousel_title_$i", ''));
+        $setting->{"carousel_text_$i"} = trim($request->input("carousel_text_$i", ''));
+    }
+
+    // Array of image fields to process: Model Property Name => Input Field Name
+    $imageFields = [
+        'about_image' => 'about_image',
+        'contact_image' => 'contact_image',
+        'carousel_image_1' => 'carousel_image_1',
+        'carousel_image_2' => 'carousel_image_2',
+        'carousel_image_3' => 'carousel_image_3',
+        'carousel_image_4' => 'carousel_image_4',
+    ];
+    
+    $uploadDirectory = 'public/frontend/Img/';
+
+    // === START OF CORRECTION ===
+    // This logic is now safer. We move the new file FIRST.
+    // We only delete the old file AFTER the new one is moved.
+
+    foreach ($imageFields as $modelProperty => $inputName) {
+        
+        // Use $request->hasFile() for a more reliable check
+        if ($request->hasFile($inputName)) {
+
+            // 1. Prepare the new file
+            $file = $request->file($inputName);
+            $ext = $file->getClientOriginalExtension();
+            $randomStr = date('Ymdhis') . Str::random(10);
+            $newFilename = strtolower($randomStr) . '.' . $ext;
+            
+            // 2. Get the old filename *before* updating the model
+            $oldFilename = $setting->$modelProperty;
+
+            // 3. Ensure the directory exists
+            if (!File::exists(public_path($uploadDirectory))) {
+                File::makeDirectory(public_path($uploadDirectory), 0755, true);
+            }
+
+            // 4. Move the new file. This is the part that can fail.
+            $file->move(public_path($uploadDirectory), $newFilename);
+
+            // 5. *After* the move is successful, update the model
+            $setting->$modelProperty = $newFilename;
+
+            // 6. *After* the model is updated, delete the old file
+            if (!empty($oldFilename) && File::exists(public_path($uploadDirectory . $oldFilename))) {
+                File::delete(public_path($uploadDirectory . $oldFilename));
+            }
+        }
+    }
+    // === END OF CORRECTION ===
+
+
+    // dd($setting->getAttributes());
+    $setting->save();
+    return redirect()->back()->with('success', "Frontend Setting Successfully Updated");
+}
     public function UpdatesSetting()
     {
         // Fetch the first record (or empty if none exists yet)
-          $setting = UpdatesSettingModel::first();
+          $setting = UpdatesSettingModel::first() ?? new UpdatesSettingModel();
 
         // Return your view (adjust the blade name if different)
         return view('admin.frontend.frontend_setting.update_setting', compact('setting'));
