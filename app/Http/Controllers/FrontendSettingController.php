@@ -151,7 +151,7 @@ public function FrontSetting()
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
                 $filename = time() . '_' . $i . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('frontend/Img'), $filename);
+                $file->move(public_path('public/frontend/Img'), $filename);
                 $setting->$field = $filename;
             }
         }

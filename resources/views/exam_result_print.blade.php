@@ -105,11 +105,11 @@
     <thead>
       <tr>
         <th>SUBJECTS</th>
-        <th>CA1</th>
-        <th>CA2</th>
-        <th>CA3</th>
-        <th>EXAM</th>
-        <th>TOTAL MARKS</th>
+        <th>CA1<br>10</th>
+        <th>CA2<br>10</th>
+        <th>CA3<br>10</th>
+        <th>EXAM<br>70</th>
+        <th>TOTAL MARKS<br>100</th>
         <th>GRADE</th>
         <th>POSITION IN SUBJECT</th>
         <th>CLASS AVERAGE</th>
