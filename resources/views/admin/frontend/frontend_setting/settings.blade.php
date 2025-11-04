@@ -61,28 +61,22 @@
                     <textarea name="carousel_text_{{ $i }}" class="form-control">{{ old('carousel_text_'.$i, $getRecord->{'carousel_text_'.$i}) }}</textarea>
                   </div>
 
-                  <div class="form-group">
-                    <label>Image {{ $i }}</label>
-                    <input type="file" name="carousel_image_{{ $i }}" class="form-control">
+                <div class="form-group">
+                  <label>Carousel Image {{ $i }} <span style="color: red;"></span></label>
+                  <input type="file" class="form-control" name="carousel_image_{{ $i }}">
+                  <div style="color: red;">{{ $errors->first('carousel_image_'.$i) }}</div>
 
-                    @php
-                      $imageField = 'carousel_image_'.$i;
-                    @endphp
+                  @php
+                    $imageField = 'carousel_image_'.$i;
+                  @endphp
 
-                    @if(!empty($getRecord->$imageField))
-                      <div style="margin-top:10px;">
-                        <img src="{{ url('public/frontend/Img/'.$getRecord->$imageField) }}" 
-                          alt="Carousel Image {{ $i }}" 
-                          style="height:80px; border-radius:5px;">
-                      </div>
-                    @else
-                      <div style="margin-top:10px;">
-                        <img src="{{ url('public/frontend/Img/default.jpg') }}" 
-                          alt="Default Carousel Image {{ $i }}" 
-                          style="height:80px; border-radius:5px; opacity:0.6;">
-                      </div>
-                    @endif
-                  </div>
+                  @if(!empty($getRecord->$imageField))
+                    <img src="{{ url('public/frontend/Img/'.$getRecord->$imageField) }}" style="width: auto; height: 80px; border-radius: 5px;" alt="Carousel Image {{ $i }}">
+                  @else
+                    <img src="{{ url('public/frontend/Img/default.jpg') }}" style="width: auto; height: 80px; border-radius: 5px; opacity: 0.6;" alt="Default Carousel Image {{ $i }}">
+                  @endif
+                </div>
+
                 </div>
               @endfor
 
