@@ -11,9 +11,10 @@
         <div class="about-us">
             <div class="about-col">
                 <h1>We are one of the top excellent schools</h1>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet, consectetur
-                    adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                <p>At our school, we believe true excellence goes beyond academic success — it is about building character, confidence, and creativity. 
+                    We provide a supportive environment where students explore their potential, engage in innovative learning, 
+                    and develop the skills needed to excel in a fast-changing world. 
+                    Our dedicated teachers and well-rounded programs ensure every child grows to become a responsible, confident, and inspired learner.
                 </p>
                 <a href="" class="blue-btn">EXPLORE NOW</a>
             </div>
@@ -56,20 +57,25 @@
         <div class="values-row">
             <div class="values-col">
                 <h3>Nursery Section</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua.</p>
+                <p>Our Nursery section provides a warm and stimulating environment where young learners begin their educational journey with joy and curiosity. 
+                   Through play-based learning, storytelling, and creative activities, children develop early literacy, numeracy, and social skills that build a solid foundation for lifelong learning.</p>
             </div>
 
             <div class="values-col">
                 <h3>Primary Section</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua.</p>
+                <p> The Primary section focuses on building strong academic skills and positive learning habits. 
+                     Our teachers encourage critical thinking, creativity, and teamwork through engaging lessons and hands-on experiences. 
+                     Pupils are guided to become confident, responsible, and independent learners prepared for greater challenges ahead.
+                </p>
             </div>
 
             <div class="values-col">
                 <h3>Secondary Section</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua.</p>
+                <p>
+                    In the Secondary section, students are equipped with the knowledge and values needed to excel academically and socially. 
+                    We combine rigorous classroom instruction with moral guidance, leadership training, and extracurricular opportunities. 
+                    Our goal is to prepare well-rounded graduates ready to succeed in higher education and contribute positively to society.
+                </p>
             </div>
         </div>
     </div>
