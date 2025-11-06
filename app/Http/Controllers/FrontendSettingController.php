@@ -106,13 +106,15 @@ class FrontendSettingController extends Controller
         $setting->update_footer_title = $request->update_footer_title;
         $setting->update_footer_description = $request->update_footer_description;
 
+        $uploadPath = 'public/frontend/Img/';
+
         // Image uploads
         for ($i = 1; $i <= 10; $i++) {
             $field = 'update_gallery_image_' . $i;
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
                 $filename = time() . '_' . $i . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('public/frontend/Img'), $filename);
+                $file->move($uploadPath, $filename);
                 $setting->$field = $filename;
             }
         }

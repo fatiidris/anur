@@ -15,14 +15,14 @@
 
             {{-- INTRO SECTION --}}
             <h5 class="mt-3 mb-3 text-primary fw-bold">Intro Section (Frontend Main Heading & Paragraph)</h5>
-<div class="mb-3">
-    <label class="form-label">Main Heading (e.g. Capturing Our School Moments)</label>
-    <input type="text" name="update_intro_title" class="form-control" value="{{ old('update_intro_title', $setting->update_intro_title ?? '') }}">
-</div>
-<div class="mb-3">
-    <label class="form-label">Intro Paragraph</label>
-    <textarea name="update_intro_description" rows="3" class="form-control">{{ old('update_intro_description', $setting->update_intro_description ?? '') }}</textarea>
-</div>
+                <div class="mb-3">
+                    <label class="form-label">Main Heading (e.g. Capturing Our School Moments)</label>
+                    <input type="text" name="update_intro_title" class="form-control" value="{{ old('update_intro_title', $setting->update_intro_title ?? '') }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Intro Paragraph</label>
+                    <textarea name="update_intro_description" rows="3" class="form-control">{{ old('update_intro_description', $setting->update_intro_description ?? '') }}</textarea>
+                </div>
 
                 {{-- FIRST GALLERY --}}
                 <h5 class="mt-4 mb-3 text-primary fw-bold">First Gallery Images (1-5)</h5>
